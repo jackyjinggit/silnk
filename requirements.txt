@@ -1,0 +1,18 @@
+alipay_sdk_python==3.7.33
+APScheduler==3.10.4
+dinero==0.4.0
+fastapi==0.140.0
+img2pdf==0.5.1
+pydantic==2.10.6
+pypdf==6.21.1
+PyMuPDF==1.28.2
+pytesseract==0.3.13
+Pillow==13.0.0 ; python_version >= "3.11"
+Pillow==12.3.0 ; python_version < "3.11"
+pywin32==311 ; sys_platform == 'win32'
+python_jose==3.4.0
+starlette==1.9.0 ; python_version >= "3.11"
+starlette==1.7.0 ; python_version < "3.11"
+typing_extensions==4.12.2
+uvicorn==0.34.0
+python-multipart==0.0.31

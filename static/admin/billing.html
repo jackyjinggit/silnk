@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 账单流水</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+</head>
+<body data-page="billing">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>账单流水</h1>
+        <div class="crumb">收款明细与汇总（个人微信收款码）</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>收款汇总</h3><span class="c">区分「已核验到账」与「待核验」</span></div>
+        <div class="bsum">
+          <div class="b hi">
+            <div class="k">已核验收款额</div>
+            <div class="v" id="s-confirmed">—<small>元</small></div>
+            <div class="n" id="s-confirmed-today">今日 —</div>
+          </div>
+          <div class="b hi">
+            <div class="k">今日已核验收款额</div>
+            <div class="v" id="s-confirmed-today-v">—<small>元</small></div>
+            <div class="n">按核验到账时间统计</div>
+          </div>
+          <div class="b pend">
+            <div class="k">待核验金额</div>
+            <div class="v" id="s-submitted">—<small>元</small></div>
+            <div class="n" id="s-submitted-today">今日 —</div>
+          </div>
+          <div class="b">
+            <div class="k">笔数</div>
+            <div class="v" id="s-count">—<small>笔</small></div>
+            <div class="n" id="s-count-note">已核验 — · 待核验 —</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>收款码设置</h3><span class="c">当前用个人微信收款码收款，无商户号</span></div>
+        <div class="form on">
+          <div class="fgrid">
+            <div class="fg">
+              <label>收款码图片路径</label>
+              <input id="pay-qr" type="text" placeholder="/pay-qr/wechat_qr.png">
+            </div>
+            <div class="fg">
+              <label>收款人昵称</label>
+              <input id="pay-payee" type="text" placeholder="收款人昵称">
+            </div>
+          </div>
+          <div class="factions">
+            <button class="btn primary" id="pay-save">保存</button>
+            <span class="fmsg" id="pay-msg"></span>
+          </div>
+          <div class="fnote">
+            当前用个人微信收款码收款，没有商户号，微信不会回调到账，因此流水先记「待核验」，
+            需人工核对到账后点「确认收款」。收款码图片文件放在服务器 static/pay/ 目录，经 /pay-qr/&lt;文件名&gt; 访问。
+          </div>
+          <div class="pay-preview" id="pay-qr-box"><div class="noqr">收款码图片不存在</div></div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>收款流水</h3><span class="c"><span id="pay-count">0 笔</span></span></div>
+        <div class="wrap">
+          <table>
+            <thead><tr><th>#</th><th>订单号</th><th>金额</th><th>机器</th><th>页数</th><th>张数</th><th>文件摘要</th><th>付款备注</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+            <tbody id="pay-rows"><tr><td colspan="11" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+
+/* 收款码设置：只在数据变了、且用户没停在输入框上时才覆盖，避免打断输入 */
+let payCfgSig = "";
+
+function renderQrPreview(url, available) {
+  const box = document.getElementById("pay-qr-box");
+  if (available && url) {
+    box.innerHTML = '<img src="' + esc(url) + '" alt="收款码预览">';
+  } else {
+    box.innerHTML = '<div class="noqr">收款码图片不存在</div>';
+  }
+}
+
+function renderPayConfig(cfg) {
+  cfg = cfg || {};
+  const ae = document.activeElement;
+  const editing = ae && (ae.id === "pay-qr" || ae.id === "pay-payee");
+  const sig = (cfg.wechat_qr || "") + "|" + (cfg.payee || "");
+  if (!editing && sig !== payCfgSig) {
+    payCfgSig = sig;
+    document.getElementById("pay-qr").value = cfg.wechat_qr || "";
+    document.getElementById("pay-payee").value = cfg.payee || "";
+  }
+  renderQrPreview(cfg.wechat_qr, cfg.qr_available);
+}
+
+async function savePayConfig() {
+  const msg = document.getElementById("pay-msg");
+  const qr = document.getElementById("pay-qr").value.trim();
+  const payee = document.getElementById("pay-payee").value.trim();
+  const body = { wechat_qr: qr, payee: payee };
+  const btn = document.getElementById("pay-save");
+  btn.disabled = true;
+  msg.style.color = "var(--ink-2)";
+  msg.textContent = "保存中…";
+  try {
+    const r = await PP.postFull("/api/pay/config", body);
+    if (r.message !== "success") throw new Error(r.message || "保存失败");
+    const cfg = r.data || {};
+    msg.style.color = "var(--ok)";
+    msg.textContent = "已保存：收款码 " + (cfg.wechat_qr || "—") + "，收款人 " + (cfg.payee || "—");
+    payCfgSig = "";
+    const ae = document.activeElement;
+    if (ae && ae.blur) ae.blur();
+    renderPayConfig(cfg);
+  } catch (e) {
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：" + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderSummary(s) {
+  s = s || {};
+  document.getElementById("s-confirmed").innerHTML = (s.confirmed_amount ?? 0) + "<small>元</small>";
+  document.getElementById("s-confirmed-today").textContent = "今日 " + (s.confirmed_amount_today ?? 0) + " 元";
+  document.getElementById("s-confirmed-today-v").innerHTML = (s.confirmed_amount_today ?? 0) + "<small>元</small>";
+  document.getElementById("s-submitted").innerHTML = (s.submitted_amount ?? 0) + "<small>元</small>";
+  document.getElementById("s-submitted-today").textContent = "今日 " + (s.submitted_amount_today ?? 0) + " 元";
+  document.getElementById("s-count").innerHTML = (s.count_total ?? 0) + "<small>笔</small>";
+  document.getElementById("s-count-note").textContent =
+    "已核验 " + (s.count_confirmed ?? 0) + " · 待核验 " + (s.count_submitted ?? 0)
+    + " · 已免收 " + (s.count_waived ?? 0) + " · 待退款 " + (s.count_refund_pending ?? 0);
+}
+
+function renderPayments(list) {
+  document.getElementById("pay-count").textContent = list.length + " 笔";
+  const body = document.getElementById("pay-rows");
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="11" class="empty">暂无流水 —— 用户端付款后出现在这里</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(p => {
+    const st = p.status;
+    const stLabel = {confirmed: "已收款", submitted: "待核验",
+      waived: "已免收", refund_pending: "待退款"}[st] || esc(st);
+    const stCls = st === "confirmed" ? "on"
+      : (st === "submitted" ? "warn" : (st === "refund_pending" ? "crit" : ""));
+    const detail = p.detail || "";
+    const timeCell = esc(p.created_at || "") +
+      (p.confirmed_at ? '<br><small style="color:var(--ink-3)">核验 ' + esc(p.confirmed_at) + "</small>" : "");
+    return `<tr>
+      <td class="m">${esc(p.id)}</td>
+      <td class="m">${esc(p.out_trade_no)}</td>
+      <td class="m"><b>${esc(p.amount)}</b><small style="color:var(--ink-3)"> 元</small></td>
+      <td class="m">${esc(p.device_id || "未指定")}</td>
+      <td class="m">${esc(p.pages ?? "—")}</td>
+      <td class="m">${esc(p.sheets ?? "—")}</td>
+      <td><span class="fn" title="${esc(detail)}">${esc(detail || "—")}</span></td>
+      <td>${esc(p.payer_note || "—")}</td>
+      <td><span class="pill ${stCls}">${stLabel}</span></td>
+      <td class="m">${timeCell}</td>
+      <td>${st === "submitted" ? '<button class="btn sm primary" data-confirm="' + esc(p.id) + '">确认收款</button>' : "—"}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function confirmPay(id) {
+  try {
+    const r = await PP.postFull("/api/pay/" + encodeURIComponent(id) + "/confirm");
+    if (r.message !== "success" && r.message !== "already confirmed") {
+      throw new Error(r.message || "操作失败");
+    }
+    await load();
+  } catch (e) {
+    PP.showErr(e.message);
+  }
+}
+
+document.getElementById("pay-rows").addEventListener("click", ev => {
+  const btn = ev.target.closest("button[data-confirm]");
+  if (!btn) return;
+  confirmPay(btn.getAttribute("data-confirm"));
+});
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：页面不含内置密钥，请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const [d, info] = await Promise.all([
+      PP.api("/api/pay/list"),
+      PP.api("/api/pay/info"),
+    ]);
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    renderSummary(d.summary || {});
+    renderPayments(d.payments || []);
+    renderPayConfig(info);
+    PP.setCounts({ payments: (d.summary && d.summary.count_submitted) || 0 });
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+document.getElementById("pay-save").onclick = savePayConfig;
+PP.boot(load);
+</script>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 团队协作看板</title>
+<style>
+  :root{
+    --bg:#0d0f13; --panel:#12151b; --panel2:#171b23; --panel3:#1c212b;
+    --line:#242a35; --line2:#2e3542;
+    --txt:#e8ecf4; --mut:#8b93a5; --dim:#5f6878;
+    --blue:#3b82f6; --blue2:#2563eb; --green:#22c55e; --amber:#f59e0b;
+    --red:#ef4444; --purple:#a78bfa; --cyan:#22d3ee;
+    --r:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:13.5px/1.5 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .app{display:flex;min-height:100vh}
+
+  /* ---------- 侧栏 ---------- */
+  .side{width:236px;flex:0 0 236px;background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{display:flex;align-items:center;gap:9px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:var(--blue);display:grid;
+    place-items:center;font-weight:800;font-size:13px;color:#fff}
+  .brand .bt{font-weight:700;font-size:14px;letter-spacing:.01em}
+  .brand .bs{font-size:10px;color:var(--dim);letter-spacing:.08em}
+  .proj{margin:12px;padding:12px;border:1px solid var(--line2);border-radius:var(--r);
+    background:linear-gradient(160deg,#1a2030,#141821)}
+  .proj .t{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+  .proj .dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+  .proj .sub{color:var(--mut);font-size:11px;margin:4px 0 9px}
+  .proj .bar{height:5px;border-radius:4px;background:#0e1219;overflow:hidden}
+  .proj .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+  .proj .pct{display:flex;justify-content:space-between;color:var(--mut);font-size:10.5px;margin-top:6px}
+  .snav{padding:4px 8px 10px;overflow:auto;flex:1}
+  .sgroup{margin-top:10px}
+  .sgroup .gl{font-size:10.5px;color:var(--dim);letter-spacing:.1em;padding:6px 10px 4px;text-transform:uppercase}
+  .sitem{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;
+    color:var(--mut);font-size:12.5px;user-select:none;transition:.12s}
+  .sitem:hover{background:var(--panel2);color:var(--txt)}
+  .sitem.on{background:#1d2636;color:#cfe0ff}
+  .sitem .n{margin-left:auto;font-size:10.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .sitem .wname{flex:0 0 auto}
+  .sitem .wrole{font-size:9.5px;color:var(--dim);margin-left:4px;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;max-width:100px}
+  .sitem .sw{width:7px;height:7px;border-radius:2px;background:var(--line2)}
+  .sfoot{padding:10px 14px;border-top:1px solid var(--line);color:var(--dim);font-size:10.5px;
+    display:flex;justify-content:space-between;align-items:center}
+
+  /* ---------- 主区 ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;gap:14px;padding:12px 22px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:rgba(13,15,19,.92);backdrop-filter:blur(8px);z-index:20}
+  .crumb{color:var(--dim);font-size:12px}
+  .crumb b{color:var(--txt);font-weight:600}
+  .top .sp{flex:1}
+  .search{width:300px;max-width:34vw;height:32px;padding:0 11px;border-radius:8px;
+    border:1px solid var(--line2);background:#0f131a;color:var(--txt);outline:none;font-size:12.5px}
+  .search:focus{border-color:var(--blue)}
+  .btn{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--txt);font-size:12.5px;cursor:pointer;white-space:nowrap}
+  .btn:hover{border-color:#3b4658}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+  .btn.primary:hover{background:var(--blue2)}
+  .btn.danger{border-color:#5a2630;color:#ff9aa8}
+  .page{padding:20px 22px 40px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+  .kpi .l{color:var(--mut);font-size:11.5px;display:flex;align-items:center;gap:6px}
+  .kpi .v{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px;
+    font-variant-numeric:tabular-nums}
+  .kpi .v small{font-size:13px;font-weight:600;color:var(--mut);margin-left:3px}
+  .kpi .n{color:var(--dim);font-size:11px;margin-top:2px}
+  .kpi .track{height:4px;border-radius:3px;background:#0e1219;margin-top:10px;overflow:hidden}
+  .kpi .track i{display:block;height:100%;background:var(--green)}
+  .kpi.b .v{color:#9cc4ff}
+
+  /* 过滤条 */
+  .bar{display:flex;align-items:center;gap:8px;margin:16px 0 10px;flex-wrap:wrap}
+  .chip{padding:5px 11px;border-radius:20px;border:1px solid var(--line2);background:transparent;
+    color:var(--mut);font-size:12px;cursor:pointer}
+  .chip:hover{color:var(--txt)}
+  .chip.on{background:#1b2436;border-color:#33507f;color:#cfe0ff}
+  .chip .n{color:var(--dim);margin-left:5px;font-variant-numeric:tabular-nums}
+  .bar .sp{flex:1}
+
+  /* 表格 */
+  .board{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  thead th{position:sticky;top:57px;z-index:5;background:#141821;color:var(--dim);
+    font-size:11px;font-weight:600;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+  tbody td{padding:9px 12px;border-bottom:1px solid #1a1e27;vertical-align:middle}
+  tbody tr.task{cursor:pointer}
+  tbody tr.task:hover{background:#151a23}
+  .grow{background:#10141b;cursor:pointer;user-select:none}
+  .grow td{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:700;font-size:12.5px}
+  .grow .caret{display:inline-block;width:12px;color:var(--dim);transition:.15s}
+  .grow.closed .caret{transform:rotate(-90deg)}
+  .grow .cnt{color:var(--dim);font-weight:500;margin-left:8px;font-size:11px}
+  .grow .mini{margin-left:auto;width:120px;height:4px;border-radius:3px;background:#0b0e14;overflow:hidden}
+  .grow .mini i{display:block;height:100%;background:var(--blue)}
+  .grow .gwrap{display:flex;align-items:center}
+  .title{display:flex;align-items:center;gap:8px;min-width:0}
+  .title .star{color:#3a4150;font-size:13px;cursor:pointer;flex:0 0 auto}
+  .title .star.on{color:var(--amber)}
+  .title .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .title .tx.done{color:var(--mut);text-decoration:line-through}
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+  .st-未开始{background:#1e242e;color:#9aa4b5}
+  .st-进行中{background:#132a4a;color:#7cb2ff}
+  .st-待验收{background:#3a2c12;color:#f7c165}
+  .st-已完成{background:#12301f;color:#5ddf94}
+  .st-已搁置{background:#2a1c25;color:#c39ab0}
+  .pri{display:inline-block;padding:1px 7px;border-radius:5px;font-size:10.5px;font-weight:700;
+    border:1px solid var(--line2);color:var(--mut)}
+  .pri.P0{border-color:#7a2833;color:#ff8a9a;background:#2a1418}
+  .pri.P1{border-color:#7a5a1f;color:#f7c165;background:#2a2214}
+  .pri.P2{border-color:#2a4a6a;color:#8fbcff;background:#13202e}
+  .pri.P3{border-color:#3a4250;color:#9aa4b5}
+  .team{color:var(--mut);font-size:12px}
+  .prog{display:flex;align-items:center;gap:8px;min-width:130px}
+  .prog .track{flex:1;height:5px;border-radius:3px;background:#0b0e14;overflow:hidden}
+  .prog .track i{display:block;height:100%;background:var(--green)}
+  .prog .p{width:34px;text-align:right;color:var(--dim);font-size:11px;font-variant-numeric:tabular-nums}
+  .who{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:12px}
+  .av{width:20px;height:20px;border-radius:50%;background:#243046;color:#9cc4ff;display:grid;
+    place-items:center;font-size:10px;font-weight:700;flex:0 0 20px}
+  .time{color:var(--dim);font-size:11.5px;white-space:nowrap}
+  .tag{display:inline-block;padding:1px 6px;border-radius:4px;background:#1a2030;color:#8fa6c8;
+    font-size:10px;margin-right:4px}
+  .empty{padding:40px;text-align:center;color:var(--dim)}
+
+  /* 抽屉 */
+  .mask{position:fixed;inset:0;background:rgba(5,7,10,.55);z-index:50;display:none}
+  .mask.on{display:block}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:94vw;background:var(--panel);
+    border-left:1px solid var(--line2);z-index:60;transform:translateX(102%);transition:.22s;
+    display:flex;flex-direction:column}
+  .drawer.on{transform:none}
+  .dh{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .dh h3{margin:0;font-size:14px;font-weight:700}
+  .dh .x{margin-left:auto;border:0;background:none;color:var(--mut);font-size:20px;cursor:pointer}
+  .db{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .f{display:flex;flex-direction:column;gap:6px}
+  .f label{font-size:11.5px;color:var(--mut)}
+  .f input,.f select,.f textarea{height:34px;padding:0 10px;border-radius:8px;
+    border:1px solid var(--line2);background:#0f131a;color:var(--txt);outline:none;font-size:12.5px}
+  .f textarea{height:70px;padding:8px 10px;resize:vertical}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--blue)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .df{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center}
+  .df .sp{flex:1}
+
+  /* 密钥弹窗 */
+  .gate{position:fixed;inset:0;background:rgba(5,7,10,.72);z-index:80;display:none;
+    align-items:center;justify-content:center}
+  .gate.on{display:flex}
+  .gate .box{width:380px;max-width:92vw;background:var(--panel);border:1px solid var(--line2);
+    border-radius:12px;padding:20px}
+  .gate h3{margin:0 0 6px;font-size:15px}
+  .gate p{color:var(--mut);font-size:12px;margin:0 0 14px;line-height:1.6}
+  .gate input{width:100%;height:36px;padding:0 10px;border-radius:8px;border:1px solid var(--line2);
+    background:#0f131a;color:var(--txt);outline:none}
+  .gate .err{color:#ff9aa8;font-size:11.5px;margin-top:8px;min-height:16px}
+  .gate .go{margin-top:12px;width:100%;height:36px;border:0;border-radius:8px;background:var(--blue);
+    color:#fff;font-weight:600;cursor:pointer}
+
+  @media (max-width:900px){
+    .side{display:none}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .search{width:150px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">SILNK</div></div>
+    </div>
+    <div class="proj">
+      <div class="t"><span class="dot"></span>思印客 Silnk</div>
+      <div class="sub">自助打印系统 · 团队协作</div>
+      <div class="bar"><i id="proj-bar" style="width:0%"></i></div>
+      <div class="pct"><span id="proj-pct">0%</span><span id="proj-cnt">0 / 0</span></div>
+    </div>
+    <nav class="snav">
+      <div class="sgroup" id="view-group"><div class="gl">视图</div></div>
+      <div class="sgroup" id="team-group"><div class="gl">模块</div></div>
+      <div class="sgroup" id="who-group"><div class="gl">负责人</div></div>
+      <div class="sgroup" id="tag-group"><div class="gl">标签</div></div>
+    </nav>
+    <div class="sfoot"><span id="sync-txt">未同步</span><span>v1.0</span></div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div class="crumb">项目 / <b>思印客 Silnk</b> / 研发任务表</div>
+      <div class="sp"></div>
+      <input class="search" id="q" placeholder="搜索任务、标签或负责人…">
+      <button class="btn" id="btn-refresh">刷新</button>
+      <button class="btn" id="btn-csv">导出 CSV</button>
+      <button class="btn primary" id="btn-new">+ 新建任务</button>
+    </div>
+
+    <div class="page">
+      <div class="kpis">
+        <div class="kpi"><div class="l">任务总数</div><div class="v" id="k-total">–</div>
+          <div class="n" id="k-total-n">加载中…</div></div>
+        <div class="kpi"><div class="l">已完成</div><div class="v" id="k-done">–</div>
+          <div class="n" id="k-done-n">完成率 0%</div><div class="track"><i id="k-done-bar" style="width:0%"></i></div></div>
+        <div class="kpi b"><div class="l">进行中</div><div class="v" id="k-doing">–</div>
+          <div class="n" id="k-doing-n">进行中的任务</div></div>
+        <div class="kpi"><div class="l">待验收</div><div class="v" id="k-review">–</div>
+          <div class="n" id="k-review-n">等待验证</div></div>
+      </div>
+
+      <div class="bar" id="chips"></div>
+
+      <div class="board">
+        <table>
+          <thead><tr>
+            <th style="width:44%">任务</th>
+            <th style="width:90px">状态</th>
+            <th style="width:62px">优先级</th>
+            <th style="width:90px">团队</th>
+            <th style="width:150px">进度</th>
+            <th style="width:96px">指派人</th>
+            <th style="width:110px">最后更新</th>
+          </tr></thead>
+          <tbody id="tbody"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <div class="dh"><h3 id="d-title">新建任务</h3><button class="x" id="d-close">×</button></div>
+  <div class="db">
+    <div class="f"><label>任务名称</label><input id="f-title" placeholder="例如：用户端 取件码"></div>
+    <div class="row2">
+      <div class="f"><label>模块 / 团队</label><select id="f-team"></select></div>
+      <div class="f"><label>优先级</label><select id="f-pri"></select></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label>状态</label><select id="f-status"></select></div>
+      <div class="f"><label>指派人</label><input id="f-who" placeholder="未分配"></div>
+    </div>
+    <div class="f"><label>进度（<span id="f-prog-t">0</span>%）</label>
+      <input id="f-prog" type="range" min="0" max="100" step="5" style="height:22px;padding:0"></div>
+    <div class="f"><label>标签（逗号分隔）</label><input id="f-tags" placeholder="核心,已上线"></div>
+    <div class="f"><label>备注</label><textarea id="f-note" placeholder="补充说明…"></textarea></div>
+  </div>
+  <div class="df">
+    <button class="btn danger" id="d-del" style="display:none">删除</button>
+    <button class="btn" id="d-star">☆ 关注</button>
+    <div class="sp"></div>
+    <button class="btn" id="d-cancel">取消</button>
+    <button class="btn primary" id="d-save">保存</button>
+  </div>
+</aside>
+
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>团队看板 · 访问密钥</h3>
+    <p>看板与后端共用管理密钥（SECRET_KEY）。输入一次后保存在本机浏览器，不会写入页面源码。</p>
+    <input id="gate-key" type="password" placeholder="SECRET_KEY" autocomplete="off">
+    <div class="err" id="gate-err"></div>
+    <button class="go" id="gate-go">进入看板</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const KEYSTORE = "pp_team_key";
+  const STATUSES = ["未开始","进行中","待验收","已完成","已搁置"];
+  const PRIORITIES = ["P0","P1","P2","P3"];
+  const TEAMS = ["用户端","管理端","打印端","后端服务","硬件","项目"];
+  const VIEWS = [
+    ["all","全部任务"],["todo","未完成"],["done","已完成"],
+    ["star","已关注"],["recent","最近更新"]
+  ];
+
+  let KEY = localStorage.getItem(KEYSTORE) || "";
+  let TASKS = [];
+  let META = {members:{}};
+  let STATE = {view:"all", status:"all", team:"", who:"", tag:"", q:""};
+  let EDITING = null;   // null=新建，否则为任务对象
+  let collapsed = {};
+  let pollTimer = null;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s==null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const pct = (a,b) => b ? Math.round(a/b*100) : 0;
+
+  /* ---------------- 接口 ---------------- */
+  async function api(path, opts){
+    const o = Object.assign({}, opts || {});
+    o.headers = Object.assign({Authorization:"Bearer " + KEY}, o.headers || {});
+    const res = await fetch(path, o);
+    if (res.status === 401) { const e = new Error("401"); e.code = 401; throw e; }
+    if (!res.ok) throw new Error(path + " 返回 " + res.status);
+    return await res.json();
+  }
+  const postJSON = (path, body) => api(path, {
+    method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+  });
+
+  /* ---------------- 数据加载 ---------------- */
+  async function load(){
+    if (!KEY) { openGate(); return; }
+    try{
+      const r = await api("/api/team/tasks");
+      TASKS = (r.data && r.data.tasks) || [];
+      META = (r.data && r.data.meta) || {members:{}};
+      closeGate();
+      renderAll();
+      $("sync-txt").textContent = "已同步 " + new Date().toLocaleTimeString("zh-CN",{hour12:false});
+    }catch(e){
+      if (e.code === 401) { openGate("密钥无效，请重新输入"); return; }
+      $("sync-txt").textContent = "同步失败";
+      console.error(e);
+    }
+  }
+
+  /* ---------------- 过滤 ---------------- */
+  function visibleTasks(){
+    let list = TASKS.slice();
+    if (STATE.view === "todo") list = list.filter(t => t.status !== "已完成" && t.status !== "已搁置");
+    if (STATE.view === "done") list = list.filter(t => t.status === "已完成");
+    if (STATE.view === "star") list = list.filter(t => t.starred);
+    if (STATE.status !== "all") list = list.filter(t => t.status === STATE.status);
+    if (STATE.team) list = list.filter(t => t.team === STATE.team);
+    if (STATE.who) list = list.filter(t => (t.assignee||"未分配") === STATE.who);
+    if (STATE.tag) list = list.filter(t => (t.tags||"").split(",").map(s=>s.trim()).includes(STATE.tag));
+    if (STATE.q){
+      const q = STATE.q.toLowerCase();
+      list = list.filter(t => (t.title + " " + t.tags + " " + t.assignee).toLowerCase().includes(q));
+    }
+    const priRank = {P0:0,P1:1,P2:2,P3:3};
+    if (STATE.view === "recent"){
+      list.sort((a,b) => (b.updated_at||"").localeCompare(a.updated_at||""));
+    }else{
+      list.sort((a,b) => (priRank[a.priority]??9) - (priRank[b.priority]??9)
+        || (b.updated_at||"").localeCompare(a.updated_at||""));
+    }
+    return list;
+  }
+
+  function relTime(ts){
+    if (!ts) return "—";
+    const d = new Date(ts.replace(" ", "T"));
+    if (isNaN(d)) return ts;
+    const now = new Date();
+    const diff = (now - d) / 1000;
+    if (diff < 60) return "刚刚";
+    if (diff < 3600) return Math.floor(diff/60) + " 分钟前";
+    const sameDay = d.toDateString() === now.toDateString();
+    if (sameDay) return d.toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",hour12:false});
+    const y = new Date(now); y.setDate(now.getDate()-1);
+    if (d.toDateString() === y.toDateString()) return "昨天";
+    return Math.floor(diff/86400) + " 天前";
+  }
+
+  /* ---------------- 渲染 ---------------- */
+  function renderAll(){
+    renderProject();
+    renderSide();
+    renderKpis();
+    renderChips();
+    renderTable();
+  }
+
+  function renderProject(){
+    const done = TASKS.filter(t => t.status === "已完成").length;
+    const p = pct(done, TASKS.length);
+    $("proj-bar").style.width = p + "%";
+    $("proj-pct").textContent = p + "%";
+    $("proj-cnt").textContent = done + " / " + TASKS.length;
+  }
+
+  function countBy(keyFn){
+    const m = {};
+    TASKS.forEach(t => { const k = keyFn(t); if (k) m[k] = (m[k]||0)+1; });
+    return m;
+  }
+
+  function renderSide(){
+    // 视图
+    const vg = $("view-group");
+    vg.querySelectorAll(".sitem").forEach(n => n.remove());
+    const viewCount = {
+      all: TASKS.length,
+      todo: TASKS.filter(t=>t.status!=="已完成"&&t.status!=="已搁置").length,
+      done: TASKS.filter(t=>t.status==="已完成").length,
+      star: TASKS.filter(t=>t.starred).length,
+      recent: TASKS.length
+    };
+    VIEWS.forEach(([key,label]) => {
+      const el = document.createElement("div");
+      el.className = "sitem" + (STATE.view===key && !STATE.team && !STATE.who && !STATE.tag ? " on" : "");
+      el.innerHTML = '<span class="sw"></span>' + esc(label) + '<span class="n">' + (viewCount[key]||0) + '</span>';
+      el.onclick = () => { STATE.view = key; STATE.team = ""; STATE.who = ""; STATE.tag = ""; renderAll(); };
+      vg.appendChild(el);
+    });
+
+    // 模块
+    const tg = $("team-group");
+    tg.querySelectorAll(".sitem").forEach(n => n.remove());
+    const teamCount = countBy(t => t.team);
+    TEAMS.forEach(team => {
+      const el = document.createElement("div");
+      el.className = "sitem" + (STATE.team===team ? " on" : "");
+      el.innerHTML = '<span class="sw" style="background:#33507f"></span>' + esc(team)
+        + '<span class="n">' + (teamCount[team]||0) + '</span>';
+      el.onclick = () => { STATE.team = (STATE.team===team ? "" : team); renderAll(); };
+      tg.appendChild(el);
+    });
+
+    // 负责人（带角色；固定按成员表顺序，其余按数量排在后面）
+    const wg = $("who-group");
+    wg.querySelectorAll(".sitem").forEach(n => n.remove());
+    const whoCount = countBy(t => t.assignee || "未分配");
+    const members = META.members || {};
+    const order = Object.keys(members);
+    const whoKeys = Object.keys(whoCount).sort((a,b) => {
+      const ia = order.indexOf(a), ib = order.indexOf(b);
+      if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      return whoCount[b] - whoCount[a];
+    });
+    whoKeys.forEach(who => {
+      const el = document.createElement("div");
+      el.className = "sitem" + (STATE.who===who ? " on" : "");
+      el.title = who + (members[who] ? " · " + members[who] : "");
+      el.innerHTML = '<span class="sw" style="background:#3b4a63"></span>'
+        + '<span class="wname">' + esc(who) + '</span>'
+        + (members[who] ? '<span class="wrole">' + esc(members[who]) + '</span>' : '')
+        + '<span class="n">' + whoCount[who] + '</span>';
+      el.onclick = () => { STATE.who = (STATE.who===who ? "" : who); renderAll(); };
+      wg.appendChild(el);
+    });
+
+    // 标签
+    const gg = $("tag-group");
+    gg.querySelectorAll(".sitem").forEach(n => n.remove());
+    const tagCount = {};
+    TASKS.forEach(t => (t.tags||"").split(",").map(s=>s.trim()).filter(Boolean)
+      .forEach(tag => tagCount[tag] = (tagCount[tag]||0)+1));
+    Object.keys(tagCount).sort((a,b)=>tagCount[b]-tagCount[a]).slice(0,10).forEach(tag => {
+      const el = document.createElement("div");
+      el.className = "sitem" + (STATE.tag===tag ? " on" : "");
+      el.innerHTML = '<span class="sw" style="background:#4b3a63"></span>#' + esc(tag)
+        + '<span class="n">' + tagCount[tag] + '</span>';
+      el.onclick = () => { STATE.tag = (STATE.tag===tag ? "" : tag); renderAll(); };
+      gg.appendChild(el);
+    });
+  }
+
+  function renderKpis(){
+    const total = TASKS.length;
+    const done = TASKS.filter(t=>t.status==="已完成").length;
+    const doing = TASKS.filter(t=>t.status==="进行中").length;
+    const review = TASKS.filter(t=>t.status==="待验收").length;
+    $("k-total").textContent = total;
+    $("k-total-n").textContent = (TASKS.filter(t=>t.status==="未开始").length) + " 个未开始";
+    $("k-done").textContent = done;
+    $("k-done-n").textContent = "完成率 " + pct(done,total) + "%";
+    $("k-done-bar").style.width = pct(done,total) + "%";
+    $("k-doing").textContent = doing;
+    $("k-doing-n").textContent = "进行中的任务";
+    $("k-review").textContent = review;
+    $("k-review-n").textContent = "等待验证";
+  }
+
+  function renderChips(){
+    const host = $("chips");
+    const items = [["all","全部",TASKS.length]];
+    STATUSES.forEach(s => items.push([s, s, TASKS.filter(t=>t.status===s).length]));
+    host.innerHTML = items.map(([key,label,n]) =>
+      '<button class="chip' + (STATE.status===key?' on':'') + '" data-st="' + esc(key) + '">'
+      + esc(label) + '<span class="n">' + n + '</span></button>'
+    ).join("") + '<div class="sp"></div>'
+      + '<span style="color:var(--dim);font-size:11.5px">当前显示 ' + visibleTasks().length + ' 项</span>';
+    host.querySelectorAll(".chip").forEach(b => {
+      b.onclick = () => { STATE.status = b.dataset.st; renderAll(); };
+    });
+  }
+
+  function renderTable(){
+    const list = visibleTasks();
+    const body = $("tbody");
+    if (!list.length){
+      body.innerHTML = '<tr><td colspan="7" class="empty">没有符合条件的任务</td></tr>';
+      return;
+    }
+    // 按模块分组（模块顺序固定，空模块不显示）
+    const groups = {};
+    list.forEach(t => { (groups[t.team] = groups[t.team] || []).push(t); });
+    let html = "";
+    TEAMS.forEach(team => {
+      const arr = groups[team];
+      if (!arr || !arr.length) return;
+      const done = arr.filter(t=>t.status==="已完成").length;
+      const closed = collapsed[team] ? " closed" : "";
+      html += '<tr class="grow' + closed + '" data-team="' + esc(team) + '"><td colspan="7"><div class="gwrap">'
+        + '<span class="caret">▾</span>' + esc(team)
+        + '<span class="cnt">' + done + ' / ' + arr.length + ' 已完成</span>'
+        + '<span class="mini"><i style="width:' + pct(done,arr.length) + '%"></i></span>'
+        + '</div></td></tr>';
+      if (!collapsed[team]){
+        arr.forEach(t => { html += rowHtml(t); });
+      }
+    });
+    body.innerHTML = html;
+    body.querySelectorAll(".grow").forEach(tr => {
+      tr.onclick = () => { collapsed[tr.dataset.team] = !collapsed[tr.dataset.team]; renderTable(); };
+    });
+    body.querySelectorAll("tr.task").forEach(tr => {
+      tr.onclick = ev => {
+        if (ev.target.classList.contains("star")) return;
+        const id = Number(tr.dataset.id);
+        const task = TASKS.find(x => x.id === id);
+        if (task) openDrawer(task);
+      };
+    });
+    body.querySelectorAll(".star").forEach(el => {
+      el.onclick = async ev => {
+        ev.stopPropagation();
+        const id = Number(el.dataset.id);
+        const t = TASKS.find(x => x.id === id);
+        await postJSON("/api/team/tasks/" + id, {starred: !t.starred});
+        await load();
+      };
+    });
+  }
+
+  function rowHtml(t){
+    const tagHtml = (t.tags||"").split(",").map(s=>s.trim()).filter(Boolean).slice(0,2)
+      .map(x => '<span class="tag">#' + esc(x) + '</span>').join("");
+    const who = t.assignee || "未分配";
+    return '<tr class="task" data-id="' + t.id + '">'
+      + '<td><div class="title">'
+      + '<span class="star' + (t.starred?' on':'') + '" data-id="' + t.id + '">'
+      + (t.starred?'★':'☆') + '</span>'
+      + '<span class="tx' + (t.status==="已完成"?' done':'') + '" title="' + esc(t.title) + '">'
+      + esc(t.title) + '</span>' + tagHtml + '</div></td>'
+      + '<td><span class="badge st-' + esc(t.status) + '">' + esc(t.status) + '</span></td>'
+      + '<td><span class="pri ' + esc(t.priority) + '">' + esc(t.priority) + '</span></td>'
+      + '<td class="team">' + esc(t.team) + '</td>'
+      + '<td><div class="prog"><span class="track"><i style="width:' + (t.progress||0) + '%"></i></span>'
+      + '<span class="p">' + (t.progress||0) + '%</span></div></td>'
+      + '<td><div class="who"><span class="av">' + esc(who.slice(0,1)) + '</span>' + esc(who) + '</div></td>'
+      + '<td class="time">' + esc(relTime(t.updated_at)) + '</td>'
+      + '</tr>';
+  }
+
+  /* ---------------- 抽屉 ---------------- */
+  function fillSelect(el, values, current){
+    el.innerHTML = values.map(v => '<option' + (v===current?' selected':'') + '>' + v + '</option>').join("");
+  }
+
+  function openDrawer(task){
+    EDITING = task || null;
+    $("d-title").textContent = task ? "编辑任务" : "新建任务";
+    $("f-title").value = task ? task.title : "";
+    fillSelect($("f-team"), TEAMS, task ? task.team : "用户端");
+    fillSelect($("f-pri"), PRIORITIES, task ? task.priority : "P2");
+    fillSelect($("f-status"), STATUSES, task ? task.status : "未开始");
+    $("f-who").value = task ? task.assignee : "";
+    $("f-prog").value = task ? task.progress : 0;
+    $("f-prog-t").textContent = task ? task.progress : 0;
+    $("f-tags").value = task ? task.tags : "";
+    $("f-note").value = task ? task.note : "";
+    $("d-del").style.display = task ? "" : "none";
+    $("d-star").textContent = task && task.starred ? "★ 已关注" : "☆ 关注";
+    $("d-star").dataset.on = task && task.starred ? "1" : "0";
+    $("mask").classList.add("on");
+    $("drawer").classList.add("on");
+    setTimeout(() => $("f-title").focus(), 60);
+  }
+
+  function closeDrawer(){
+    $("mask").classList.remove("on");
+    $("drawer").classList.remove("on");
+    EDITING = null;
+  }
+
+  async function saveTask(){
+    const payload = {
+      title: $("f-title").value.trim(),
+      team: $("f-team").value,
+      status: $("f-status").value,
+      priority: $("f-pri").value,
+      progress: Number($("f-prog").value),
+      assignee: $("f-who").value.trim(),
+      tags: $("f-tags").value.trim(),
+      note: $("f-note").value.trim(),
+      starred: $("d-star").dataset.on === "1"
+    };
+    if (!payload.title) { alert("任务名称不能为空"); return; }
+    try{
+      if (EDITING) await postJSON("/api/team/tasks/" + EDITING.id, payload);
+      else await postJSON("/api/team/tasks", payload);
+      closeDrawer();
+      await load();
+    }catch(e){ alert("保存失败：" + e.message); }
+  }
+
+  /* ---------------- 导出 ---------------- */
+  function exportCsv(){
+    const list = visibleTasks();
+    const head = ["任务","模块","状态","优先级","进度","指派人","标签","最后更新"];
+    const rows = list.map(t => [t.title, t.team, t.status, t.priority, t.progress + "%",
+      t.assignee || "未分配", t.tags || "", t.updated_at || ""]);
+    const csv = "\ufeff" + [head].concat(rows).map(r =>
+      r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(",")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+    a.download = "Silnk-tasks-" + new Date().toISOString().slice(0,10) + ".csv";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+
+  /* ---------------- 密钥弹窗 ---------------- */
+  function openGate(msg){
+    $("gate").classList.add("on");
+    $("gate-err").textContent = msg || "";
+    setTimeout(() => $("gate-key").focus(), 60);
+  }
+  function closeGate(){ $("gate").classList.remove("on"); }
+
+  /* ---------------- 事件 ---------------- */
+  $("btn-refresh").onclick = load;
+  $("btn-csv").onclick = exportCsv;
+  $("btn-new").onclick = () => openDrawer(null);
+  $("d-close").onclick = closeDrawer;
+  $("d-cancel").onclick = closeDrawer;
+  $("mask").onclick = closeDrawer;
+  $("d-save").onclick = saveTask;
+  $("d-star").onclick = () => {
+    const el = $("d-star");
+    el.dataset.on = el.dataset.on === "1" ? "0" : "1";
+    el.textContent = el.dataset.on === "1" ? "★ 已关注" : "☆ 关注";
+  };
+  $("d-del").onclick = async () => {
+    if (!EDITING) return;
+    if (!confirm("确定删除任务「" + EDITING.title + "」？")) return;
+    await api("/api/team/tasks/" + EDITING.id, {method:"DELETE"});
+    closeDrawer();
+    await load();
+  };
+  $("f-prog").oninput = () => { $("f-prog-t").textContent = $("f-prog").value; };
+  $("q").oninput = () => { STATE.q = $("q").value.trim(); renderChips(); renderTable(); };
+
+  $("gate-go").onclick = async () => {
+    const v = $("gate-key").value.trim();
+    if (!v) { $("gate-err").textContent = "请输入密钥"; return; }
+    KEY = v;
+    try{
+      const r = await api("/api/team/tasks");
+      localStorage.setItem(KEYSTORE, v);
+      TASKS = (r.data && r.data.tasks) || [];
+      META = (r.data && r.data.meta) || {members:{}};
+      closeGate();
+      renderAll();
+    }catch(e){
+      KEY = "";
+      $("gate-err").textContent = e.code === 401 ? "密钥无效（401），请重新输入" : ("连接失败：" + e.message);
+    }
+  };
+  $("gate-key").onkeydown = ev => { if (ev.key === "Enter") $("gate-go").click(); };
+
+  /* ---------------- 启动 ---------------- */
+  load();
+  pollTimer = setInterval(() => {
+    if (!$("drawer").classList.contains("on") && $("gate").classList.contains("on") === false) load();
+  }, 20000);
+})();
+</script>
+</body>
+</html>

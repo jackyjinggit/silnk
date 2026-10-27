@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 打印机业务「月入 1 万」落地方案</title>
+<style>
+  :root{
+    --forest:#2f5d3a;      /* 森林绿 */
+    --forest-2:#3d7a4c;
+    --moss:#6b8f71;
+    --leaf:#cfe0d2;
+    --cream:#faf8f3;       /* 暖白 */
+    --paper:#ffffff;
+    --ink:#22302a;
+    --sub:#5d6b62;
+    --line:#e3e6df;
+    --warn:#a8632a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--cream);color:var(--ink);
+    font-family:"Georgia","Songti SC","SimSun",serif;
+    font-size:16.5px;line-height:1.85;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 72px;display:grid;
+        grid-template-columns:220px 1fr;gap:44px;}
+  header.top{
+    grid-column:1/-1;margin:0 -24px 8px;padding:52px 48px 40px;
+    background:linear-gradient(160deg,#2f5d3a 0%,#3d7a4c 60%,#527f5c 100%);
+    color:#f4f8f4;border-bottom:4px solid #24462c;
+  }
+  header.top .kicker{font-size:12.5px;letter-spacing:.28em;text-transform:uppercase;opacity:.82;}
+  header.top h1{font-size:33px;margin:14px 0 10px;font-weight:700;letter-spacing:.01em;line-height:1.35;}
+  header.top p{margin:0;max-width:760px;font-size:15px;opacity:.9;}
+  header.top .goal{display:inline-block;margin-top:18px;padding:6px 14px;border:1px solid #cfe0d2;
+    border-radius:999px;font-size:13.5px;letter-spacing:.02em;}
+
+  nav.toc{position:sticky;top:24px;align-self:start;font-family:-apple-system,"Segoe UI",sans-serif;}
+  nav.toc h4{margin:0 0 10px;font-size:12px;letter-spacing:.2em;color:var(--moss);text-transform:uppercase;}
+  nav.toc a{display:block;padding:7px 12px;color:var(--sub);text-decoration:none;font-size:14px;
+    border-left:3px solid transparent;border-radius:0 6px 6px 0;}
+  nav.toc a:hover{color:var(--forest);background:#eef3ee;border-left-color:var(--leaf);}
+
+  main{min-width:0;}
+  section{background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:30px 34px;margin:0 0 22px;box-shadow:0 1px 0 rgba(47,93,58,.04);}
+  section>h2{font-size:21px;margin:0 0 6px;color:var(--forest);}
+  section>h2 .n{display:inline-block;min-width:30px;color:var(--moss);font-size:15px;
+    font-family:-apple-system,sans-serif;vertical-align:middle;}
+  .lead{color:var(--sub);font-size:14.5px;margin:0 0 18px;
+    border-bottom:1px dashed var(--line);padding-bottom:12px;}
+  h3{font-size:15px;color:var(--forest-2);margin:22px 0 8px;font-family:-apple-system,"Segoe UI",sans-serif;
+    letter-spacing:.02em;}
+  p{margin:0 0 12px;}
+  ul{margin:0 0 12px;padding-left:22px;}
+  li{margin:5px 0;}
+  strong{color:#1c2a22;}
+  .callout{background:#f0f5f0;border-left:4px solid var(--forest);border-radius:0 10px 10px 0;
+    padding:14px 18px;margin:0 0 16px;font-size:15px;}
+  .tag{display:inline-block;font-family:-apple-system,sans-serif;font-size:11.5px;padding:2px 8px;
+    border-radius:5px;margin-right:6px;letter-spacing:.04em;}
+  .tag.f{background:#e3ede4;color:#2f5d3a;}
+  .tag.e{background:#f6ecd9;color:#8a5a1e;}
+  .tag.s{background:#e6ebf2;color:#3b5573;}
+
+  table{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:14.5px;
+    font-family:-apple-system,"Segoe UI",sans-serif;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:#f2f6f2;color:var(--forest);font-weight:600;font-size:13.5px;letter-spacing:.02em;}
+  tr:last-child td{border-bottom:none;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+
+  /* CSS 柱状对比：价格锚点（元/面） */
+  .chart{font-family:-apple-system,"Segoe UI",sans-serif;font-size:13.5px;margin:6px 0 18px;}
+  .bar{display:grid;grid-template-columns:180px 1fr 62px;align-items:center;gap:10px;margin:9px 0;}
+  .bar .lab{color:var(--sub);}
+  .bar .track{background:#eef2ee;border-radius:6px;height:22px;position:relative;overflow:hidden;}
+  .bar .fill{height:100%;border-radius:6px;background:var(--moss);}
+  .bar.us .fill{background:var(--forest);}
+  .bar .val{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .chart .cap{color:var(--sub);font-size:12.5px;margin-top:8px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:#fcfdfb;}
+  .card h4{margin:0 0 6px;font-size:14px;color:var(--forest-2);font-family:-apple-system,sans-serif;}
+  .card p{margin:0;font-size:14px;color:var(--sub);}
+
+  .must{color:#2f5d3a;font-weight:700;}
+  .should{color:#8a5a1e;font-weight:700;}
+  .could{color:#3b5573;font-weight:700;}
+
+  footer{grid-column:1/-1;color:var(--sub);font-size:13px;padding-top:8px;
+    font-family:-apple-system,sans-serif;}
+  footer h3{color:var(--forest);}
+  footer ol{padding-left:20px;}
+
+  @media(max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:0;}
+    nav.toc{position:static;margin:0 0 18px;border:1px solid var(--line);border-radius:12px;
+      padding:12px;background:#fff;}
+    nav.toc a{display:inline-block;border-left:none;border-bottom:2px solid transparent;}
+    header.top{padding:36px 24px 30px;}
+    header.top h1{font-size:25px;}
+    .grid2{grid-template-columns:1fr;}
+    .bar{grid-template-columns:120px 1fr 54px;}
+    section{padding:22px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="kicker">Strategic Growth Compass · 打印机业务</div>
+    <h1>思印客 Silnk · 打印机业务「月入 1 万」落地方案</h1>
+    <p>面向 4 人创始团队，约束为服务器无显卡。目标：6 个月内把月毛利做到 1 万元，并跑出可复制的单点模型。</p>
+    <span class="goal">目标 · 月毛利 1 万元 ｜ 大学校园文档场景 ｜ 已有公司</span>
+  </header>
+
+  <nav class="toc">
+    <h4>目录</h4>
+    <a href="#s1">一、核心判断</a>
+    <a href="#s2">二、公司定位与生态位</a>
+    <a href="#s3">三、需求信号</a>
+    <a href="#s4">四、商业模式与收入</a>
+    <a href="#s5">五、成本结构</a>
+    <a href="#s6">六、竞争格局</a>
+    <a href="#s7">七、战略选项与取舍</a>
+    <a href="#s8">八、路线图</a>
+    <a href="#s9">九、风险与反转信号</a>
+    <a href="#s10">十、实施步骤</a>
+    <a href="#s11">十一、结论与近期决策</a>
+    <a href="#s12">十二、团队分工与并行作战</a>
+  </nav>
+
+  <main>
+
+    <section id="s1">
+      <h2><span class="n">01</span>核心判断（需要现在拍板的事）</h2>
+      <p class="lead">先给结论，再给依据。</p>
+      <div class="callout">
+        <strong>推荐：不靠"铺设备卖打印页"，靠「1 个自营样板点位 + 软件与增值变现」两条腿，6 个月内把月毛利做到 1 万。</strong>
+      </div>
+      <ul>
+        <li><span class="tag f">事实</span>校园打印单价被制度性锁死在 <strong>0.1~0.15 元/页</strong>，且多为黑白（北外图书馆黑白单面 0.1 元、中国海洋大学 0.15 元/张）。</li>
+        <li><span class="tag f">事实</span>单张硬成本约 <strong>0.05 元</strong>（纸 0.03 + 碳粉与维修 0.02），单面毛利 <strong>~0.05 元</strong>。</li>
+        <li><span class="tag e">估算</span>纯打印要月净利 1 万，需约 20 万页/月（≈日 7000 页）——单点位不现实。</li>
+        <li><span class="tag f">事实</span>经营 6 年的校园复印店实证：<strong>复印只是引流，利润来自增值服务</strong>（模板、论文、装订、彩印、设计排版）。</li>
+        <li><span class="tag s">建议</span>竞争位选「确定性交付 + 增值 + AI 助手」，不做泛社会低价云打印（对手已到 5 分/面包邮，采用工业级设备 + AI 拼版）。</li>
+      </ul>
+      <p><strong>明确不做：</strong>不铺多个低效点位；不做彩色大幅面 / 广告物料；不做依赖 GPU 的本地大模型。</p>
+    </section>
+
+    <section id="s2">
+      <h2><span class="n">02</span>公司定位与生态位</h2>
+      <table>
+        <tr><th>维度</th><th>结论</th></tr>
+        <tr><td>公司</td><td>思印客 Silnk（已注册），软硬一体的「校园文档交付终端 + 打印数字化系统」</td></tr>
+        <tr><td>团队</td><td>4 人：33 岁 AI 架构师、18 岁硬件/服务器、12 岁全栈、16 岁战略/运营</td></tr>
+        <tr><td>硬约束</td><td>服务器<strong>无显卡</strong> → AI 全部走云端 API，本地只跑业务、队列、PDF 渲染</td></tr>
+        <tr><td>稀缺资产</td><td>自有软件（下单/队列/计价/告警/内容审核/自助客户端）、2 台打印机 + ESP32-S3、1 个在谈校园点位</td></tr>
+        <tr><td>关键依赖</td><td>学校场地审批、接电接网、纸张耗材供应、第三方 AI / 支付 / 短信 API</td></tr>
+      </table>
+      <p><strong>生态位：</strong>不站在"最便宜的打印"一端，也不站在"纯人工图文店"一端，而是占中间的「<strong>确定性交付 + 增值 + AI 助手</strong>」——批量、急件、有格式要求的学生与班级，最愿意为"省时间、别出错"买单。</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="n">03</span>需求信号（大学场景）</h2>
+      <ul>
+        <li><span class="tag f">事实</span>图书馆自助文印 <strong>0.1~0.15 元/页</strong>（多为黑白）；校外图文店 <strong>0.5 元/面</strong>；校内低价自助店可低至 <strong>0.06 元/面</strong>；云打印最低 <strong>0.05 元/面、包邮次日达</strong>。</li>
+        <li><span class="tag f">行为</span>学生需求高频、批量、临时急用；简历/合同/证件等敏感件偏好当面打印。</li>
+        <li><span class="tag s">判断</span>一部分人只看"最低价"，另一部分人要"立刻拿到 + 能现场改格式"。→ 我们<strong>打交付确定性与增值，不打最低价</strong>。</li>
+        <li><span class="tag e">待校准</span>目标点位真实日订单量、复购率、增值渗透率（试运营前均为未知）。</li>
+      </ul>
+
+      <h3>价格锚点对比（元 / 面，A4 黑白）</h3>
+      <div class="chart">
+        <div class="bar"><span class="lab">云打印平台</span><span class="track"><span class="fill" style="width:10%"></span></span><span class="val">0.05</span></div>
+        <div class="bar"><span class="lab">校内低价自助店</span><span class="track"><span class="fill" style="width:12%"></span></span><span class="val">0.06</span></div>
+        <div class="bar us"><span class="lab">图书馆自助文印</span><span class="track"><span class="fill" style="width:24%"></span></span><span class="val">0.10~0.15</span></div>
+        <div class="bar us"><span class="lab">我们的定位区</span><span class="track"><span class="fill" style="width:26%"></span></span><span class="val">平价 + 增值</span></div>
+        <div class="bar"><span class="lab">校外图文店</span><span class="track"><span class="fill" style="width:100%"></span></span><span class="val">0.50</span></div>
+        <p class="cap">数据来源：北外图书馆、中国海洋大学图书馆价目；《长江日报》实测报道。柱长为示意比例。</p>
+      </div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="n">04</span>商业模式与收入结构（怎么凑到 1 万）</h2>
+      <p class="lead"><span class="tag e">估算</span>以下为计划假设，须用真实试运营校准。</p>
+      <table>
+        <tr><th>收入块</th><th>假设</th><th class="num">月营收（估）</th><th class="num">月毛利（估）</th></tr>
+        <tr><td><strong>A 自营点位（1 个）</strong></td><td>打印日 400~600 面 × 0.15 元；增值日 10~15 单 × 5~30 元</td><td class="num">3,500~5,500</td><td class="num">2,000~3,300</td></tr>
+        <tr><td><strong>B 软件订阅 / 赋能</strong></td><td>卖给周边打印点 / 学校文印室 3~8 家 × 300~500 元/月</td><td class="num">900~4,000</td><td class="num">810~3,600</td></tr>
+        <tr><td><strong>C AI 增值按单</strong></td><td>排版 / 翻译 / 封面 / 合规预检 3~10 元/单，日 20~50 单</td><td class="num">1,800~9,000</td><td class="num">1,440~7,200</td></tr>
+        <tr style="background:#f2f6f2"><td colspan="3"><strong>合计（渐近目标）</strong></td><td class="num"><strong>可达 ~10,000</strong></td></tr>
+      </table>
+      <ul>
+        <li>打印本身毛利极薄，<strong>靠量无法达标</strong>，必须叠加 B、C。</li>
+        <li>AI 增值边际成本 ≈ API token + 少量人力，<strong>不依赖 GPU</strong>。</li>
+        <li>软件订阅边际成本 ≈ 1 台无显卡服务器可承载，毛利近 90%，是最健康的一块。</li>
+      </ul>
+    </section>
+
+    <section id="s5">
+      <h2><span class="n">05</span>成本结构（无显卡约束下的技术选型）</h2>
+      <div class="grid2">
+        <div class="card"><h4>AI：全部走云端 API</h4><p>DeepSeek 做指令/文案，GLM-5.3-Flash 做印前视觉审核。本地只跑业务、队列、PDF 渲染与规则缓存，<strong>不需要 GPU</strong>。</p></div>
+        <div class="card"><h4>固定成本</h4><p>场地分成 / 电费、设备折旧、服务器、短信与支付手续费。</p></div>
+        <div class="card"><h4>变动成本</h4><p>纸、碳粉、装订耗材、AI API token。</p></div>
+        <div class="card"><h4>规模效应</h4><p>软件与 AI 边际成本趋近于 0，是"1 万"里可复制的部分；打印是引流，不承担利润。</p></div>
+      </div>
+    </section>
+
+    <section id="s6">
+      <h2><span class="n">06</span>竞争格局</h2>
+      <table>
+        <tr><th>玩家</th><th>价格锚点</th><th>优势</th><th>软肋（我们的机会）</th></tr>
+        <tr><td>图书馆自助文印（如联创系统）</td><td>0.1~0.15 元/页</td><td>便宜、官方</td><td>要装驱动、无增值、体验旧</td></tr>
+        <tr><td>校外图文店</td><td>0.5 元/面</td><td>便利、能现场改</td><td>贵</td></tr>
+        <tr><td>云打印平台</td><td>5 分/面包邮</td><td>工业级设备、AI 拼版</td><td>只做量大不急的件，不解决"立刻要"</td></tr>
+        <tr><td>校内低价自助店</td><td>0.06 元/面</td><td>极低毛利走量</td><td>纯自助，无服务无增值</td></tr>
+        <tr style="background:#f2f6f2"><td><strong>我们</strong></td><td>打印平价 + 增值/软件</td><td>确定交付 + 增值 + AI</td><td>需先拿下 1 个点位验证</td></tr>
+      </table>
+    </section>
+
+    <section id="s7">
+      <h2><span class="n">07</span>战略选项与取舍</h2>
+      <div class="grid2">
+        <div class="card"><h4>A 自营铺点</h4><p>重资产、见效慢，但能验证真实单位经济。</p></div>
+        <div class="card"><h4>B 软件赋能 / 订阅</h4><p>轻、可复制、毛利高。</p></div>
+        <div class="card"><h4>C 维持现状</h4><p>只保留黑客松 demo，无收入 —— 作为基线对照。</p></div>
+        <div class="card" style="border-color:#cfe0d2;background:#f0f5f0"><h4>推荐组合</h4><p>A（1 个样板点）+ B（同步卖软件）为主，C 作基线；<strong>明确不做 D：泛云打印低价竞争</strong>。</p></div>
+      </div>
+    </section>
+
+    <section id="s8">
+      <h2><span class="n">08</span>路线图（Must / Should / Could）</h2>
+      <table>
+        <tr><th>层级</th><th>时间</th><th>举措</th><th>依赖</th><th>决策节点</th></tr>
+        <tr><td class="must">Must</td><td>本月</td><td>拿到德科技术学院场地<strong>书面许可</strong>（分成/接电接网/责任）；跑通 1 个点位订单闭环；计价/取件/AI 增值上线</td><td>学校审批</td><td>拿到许可才继续投设备</td></tr>
+        <tr><td class="should">Should</td><td>1~3 月</td><td>系统 SaaS 化，签约 3 家打印点试点；上线 2~3 个 AI 增值（排版/封面/查重预检提示）</td><td>团队产能</td><td>3 家试点是否愿意付费</td></tr>
+        <tr><td class="could">Could</td><td>3~6 月</td><td>复制第 2 个点位；接入校园卡一卡通；向学校文印室做 B 端交付</td><td>资金 / 许可</td><td>第 1 点位是否盈利</td></tr>
+      </table>
+    </section>
+
+    <section id="s9">
+      <h2><span class="n">09</span>风险与反转信号</h2>
+      <table>
+        <tr><th>风险</th><th>触发信号</th><th>应对（反转动作）</th></tr>
+        <tr><td>场地未获批</td><td>审批卡住 / 要价过高</td><td>转<strong>纯软件</strong>模式，不改目标</td></tr>
+        <tr><td>单价被压到 0.06</td><td>周边价格战</td><td>放弃自营，转<strong>纯 SaaS</strong></td></tr>
+        <tr><td>AI 增值无人付费</td><td>渗透率长期 &lt; 5%</td><td>砍 AI，保留基础打印 + 装订</td></tr>
+        <tr><td><strong>用工合规</strong></td><td>—</td><td>未成年成员<strong>只做研发/内容</strong>，监护人书面同意，不签劳动合同、不参与对外签约与收款，遵守未成年工保护规定</td></tr>
+        <tr><td>敏感文件合规</td><td>侵权 / 隐私投诉</td><td>PII 打码、印前内容审核（已做），<strong>不做侵权模板售卖</strong></td></tr>
+      </table>
+    </section>
+
+    <section id="s10">
+      <h2><span class="n">10</span>实施步骤（30 / 60 / 90 天）</h2>
+      <h3>第 1~30 天 · 立地基</h3>
+      <ul>
+        <li>法务与资质：公司资质、商标（第 40 / 9 / 35 类）。</li>
+        <li>场地：与德科技术学院确认分成、接电接网、责任划分，拿<strong>书面</strong>协议。</li>
+        <li>设备就位：打印机 + ESP32-S3 心跳 + Linux 客户端，跑通自助下单 → 支付 → 出纸 → 取件。</li>
+        <li>记账：每单记录页数 / 成本 / 收入，建立真实单位经济基线。</li>
+      </ul>
+      <h3>第 31~60 天 · 跑数据</h3>
+      <ul>
+        <li>上线增值价目：装订（胶装/骑马订/覆膜）、彩印、封面、排版。</li>
+        <li>校准单位经济，砍掉亏损类目。</li>
+        <li>系统 SaaS 化，给 2~3 家打印点<strong>免费试用</strong>换反馈与案例。</li>
+      </ul>
+      <h3>第 61~90 天 · 见结果</h3>
+      <ul>
+        <li>签约 3~8 家订阅，发布 AI 增值。</li>
+        <li>得出"月毛利是否达 1 万"的阶段结论。</li>
+        <li>决策：是否复制第 2 个点位。</li>
+      </ul>
+      <div class="callout"><strong>指标树：</strong>命题 → 月毛利 1 万；领先指标 = 日订单数、复购率、增值渗透率；驱动 = 点位覆盖、SaaS 家数、AI 单量；护栏 = 客诉率、耗材成本/页、合规事件 0。</div>
+    </section>
+
+    <section id="s11">
+      <h2><span class="n">11</span>结论与近期决策</h2>
+      <ul>
+        <li><strong>现在要批准：</strong>① 德科技术学院点位落地；② 系统 SaaS 化投入；③ 3 家打印点试点。</li>
+        <li><strong>观察什么：</strong>日订单量、增值渗透率、SaaS 付费与续费。</li>
+        <li><strong>下一步：</strong>先用 1 个点位验证真实单位经济，再谈复制；<strong>验证前不铺第 2 个点位、不做彩色大幅面</strong>。</li>
+      </ul>
+    </section>
+
+    <section id="s12">
+      <h2><span class="n">12</span>团队分工与并行作战（4 条线）</h2>
+      <p class="lead">按收入块切工作流，每人一条<strong>主线（owner）</strong>，再加一条支援线；<strong>签约与收款只由成年成员承担</strong>。</p>
+      <table>
+        <tr><th>成员</th><th>主线（owner）</th><th>具体产出</th><th>支援线</th><th>周指标</th></tr>
+        <tr><td>33 岁 AI 架构师</td><td><strong>C · AI 增值线</strong></td><td>排版/封面/翻译/查重预检/合规审核；架构与计价一致性</td><td>法务·场地审批（法人）</td><td>增值渗透率、AI 单量、单均成本</td></tr>
+        <tr><td>18 岁 硬件/服务器</td><td><strong>A · 打印交付线</strong></td><td>打印机/客户端/ESP32 心跳/耗材/现场运维/出纸质量</td><td>场地接电接网</td><td>出纸成功率、故障时长、单页耗材成本</td></tr>
+        <tr><td>12 岁 全栈</td><td><strong>B · 软件系统线</strong></td><td>下单/支付/队列/管理端/SaaS 化/试用户开通</td><td>AI 前端联调</td><td>系统可用率、开通家数</td></tr>
+        <tr><td>16 岁 战略/运营</td><td><strong>D · 增长运营线</strong></td><td>学校与打印点地推、定价测试、口碑内容、记账核算</td><td>数据看板</td><td>日订单、复购率、签约家数</td></tr>
+      </table>
+      <div class="callout"><strong>签约与收款（合规）：</strong>合同、收款、对外承诺由 33 岁（主）与 18 岁（次）落签；12 / 16 岁只做研发与内容，监护人书面同意，不签劳动合同、不参与签约与收款。</div>
+      <h3>合兵点（四条线共用的接口约定）</h3>
+      <ul>
+        <li>唯一计价源 = 后端 <code>pay.py</code>，前端不得自行定价 —— 避免四条线价格不一致。</li>
+        <li>每天 21:00 五分钟卡点同步（沿用项目规则），只同步卡点，不汇报进度。</li>
+        <li>每周一张指标表：四条线各报 2 个数（见第八节指标树）。</li>
+      </ul>
+      <p><strong>分头但不分家：</strong>主线 owner 决自己的日常事；跨线接口（下单 → 出纸 → 增值 → 交付）出问题找对应 owner，30 分钟定不下来就升级给 33 岁。</p>
+      <h3>Must 阶段的起跑（第一周四条线各出一个可验证结果）</h3>
+      <ul>
+        <li>33 岁：盯场地<strong>书面许可</strong>（分成/接电接网/责任）。</li>
+        <li>18 岁：设备到位，打印机 + 客户端 + ESP32 心跳跑起来。</li>
+        <li>12 岁：自助下单 → 支付 → 取件闭环跑通。</li>
+        <li>16 岁：摸清目标点位<strong>真实日流量</strong>（蹲点计数），拿到定价第一手数据。</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <h3>来源</h3>
+    <ol>
+      <li>北京外国语大学图书馆 自助文印价目：黑白单面 0.1 元/页、双面 0.2 元/页。</li>
+      <li>中国海洋大学图书馆 自助服务系统：A4 黑白 0.15 元/张、彩色 1.5 元/张。</li>
+      <li>上海大学公开价目表：胶装 10.5 元/本、骑马订 3.5 元、覆膜 2.5 元、A4 黑白 0.25 元/张。</li>
+      <li>《长江日报》报道：校外打印店 0.5 元/面、校内店 6 分/面、云打印最低 5 分/面包邮。</li>
+      <li>第三方（校园复印店经营者自述）：单张硬成本 ~0.05 元，复印只是引流、利润来自增值服务。</li>
+    </ol>
+    <p>说明：单价与成本为公开来源事实；收入与收益区间为估算，须以真实试运营校准。</p>
+  </footer>
+
+</div>
+</body>
+</html>

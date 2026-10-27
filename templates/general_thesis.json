@@ -1,0 +1,16 @@
+{
+  "id": "general_thesis",
+  "name": "通用论文模板",
+  "margins_mm": {"top": 25, "bottom": 25, "left": 30, "right": 20},
+  "font_whitelist": [
+    "simsun", "songti", "stsong", "nsimsun", "宋体",
+    "simhei", "heiti", "stheiti", "黑体",
+    "times", "timesnewroman", "arial", "calibri", "cambria",
+    "microsoftyahei", "yahei", "微软雅黑"
+  ],
+  "line_spacing": 1.5,
+  "page_number_required": true,
+  "cover_required": true,
+  "references_required": true,
+  "reference_min_entries": 3
+}

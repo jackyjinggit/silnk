@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 订单流水</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+<style>
+  /* 订单页专用：筛选条与分页 */
+  .filterbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .filterbar input[type="search"]{flex:1;min-width:200px;font:inherit;font-size:13.5px;padding:8px 12px;
+    border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+  .filterbar input[type="search"]:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(76,99,240,.13)}
+  .filterbar select{font:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:8px;background:var(--bg);color:var(--ink)}
+  .pager{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--ink-2)}
+  .pager .sp{flex:1}
+  .pager button{font:inherit;font-size:12.5px;padding:5px 11px;border-radius:7px;cursor:pointer;
+    border:1px solid var(--line);background:var(--white);color:var(--ink-2)}
+  .pager button:hover:not(:disabled){border-color:var(--line-strong);color:var(--ink)}
+  .pager button:disabled{opacity:.45;cursor:not-allowed}
+  .pager .pg{font-family:var(--num);color:var(--ink)}
+  .amt{font-family:var(--num);font-weight:700}
+  td .fn{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    vertical-align:bottom}
+</style>
+</head>
+<body data-page="orders">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem active" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>订单流水</h1>
+        <div class="crumb">全部打印订单、金额与执行状态</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm" id="btn-csv">导出 CSV</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="kpis reveal">
+        <div class="kpi"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>今日订单</div>
+          <div class="v" id="k-today">–</div><div class="n" id="k-today-n">等待数据</div></div>
+        <div class="kpi"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>今日已完成</div>
+          <div class="v" id="k-done">–</div><div class="n" id="k-done-n">完成率 —</div><div class="bar"><span id="k-done-bar" style="width:0%"></span></div></div>
+        <div class="kpi accent"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>待打印</div>
+          <div class="v" id="k-pending">–</div><div class="n" id="k-pending-n">当前队列</div></div>
+        <div class="kpi"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>今日金额</div>
+          <div class="v" id="k-amount">–</div><div class="n" id="k-amount-n">按下单时间统计</div></div>
+      </div>
+
+      <div class="card reveal" id="reprint-card" style="display:none">
+        <div class="ch"><h3>重印申请</h3><span class="c"><span id="rp-count">0 条</span></span></div>
+        <div class="wrap">
+          <table>
+            <thead><tr>
+              <th>订单</th><th>文件</th><th>原因</th><th>状态</th><th>操作</th>
+            </tr></thead>
+            <tbody id="reprints"><tr><td colspan="5" class="empty">暂无重印申请</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>订单流水</h3><span class="c"><span id="ord-count">0 单</span></span></div>
+
+        <div class="filterbar">
+          <input type="search" id="q" placeholder="搜索订单号、文件或打印机…">
+          <select id="f-status">
+            <option value="all">全部状态</option>
+            <option value="pending">待打印</option>
+            <option value="completed">已完成</option>
+          </select>
+          <select id="f-printer"><option value="all">全部设备</option></select>
+          <select id="f-range">
+            <option value="today">今天</option>
+            <option value="all">全部时间</option>
+          </select>
+        </div>
+
+        <div class="wrap">
+          <table>
+            <thead><tr>
+              <th>订单</th><th>取件码</th><th>文件</th><th>页数</th><th>份数</th><th>方式</th>
+              <th>打印机</th><th>金额</th><th>承诺</th><th>状态</th><th>提交时间</th>
+            </tr></thead>
+            <tbody id="orders"><tr><td colspan="11" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <span id="pg-info">—</span>
+          <span class="sp"></span>
+          <button id="pg-prev">上一页</button>
+          <span class="pg" id="pg-cur">1 / 1</span>
+          <button id="pg-next">下一页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+
+let ORDERS = [];
+let DEVICES = [];
+const STATE = { q: "", status: "all", printer: "all", range: "today", page: 1, size: 10 };
+const todayStr = () => {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
+         String(d.getDate()).padStart(2, "0");
+};
+
+function filtered(){
+  const today = todayStr();
+  let list = ORDERS.slice();
+  if (STATE.range === "today") list = list.filter(o => (o.created_at || "").startsWith(today));
+  if (STATE.status !== "all") list = list.filter(o => o.status === STATE.status);
+  if (STATE.printer !== "all") list = list.filter(o => (o.printer_id || "") === STATE.printer);
+  if (STATE.q){
+    const q = STATE.q.toLowerCase();
+    list = list.filter(o => (
+      String(o.id) + " " + (o.out_trade_no || "") + " " + (o.filename || "") + " " +
+      (o.printer_id || "")
+    ).toLowerCase().includes(q));
+  }
+  list.sort((a, b) => b.id - a.id);
+  return list;
+}
+
+/* 交付承诺列：已免单 / 超时 / 承诺完成时间 */
+function promiseCell(o){
+  if (o.waived) return '<span class="pill on">已免单</span>';
+  if (o.overtime) return '<span class="pill warn">超时</span>';
+  if (o.eta_deadline) return '<span class="m">' + esc(String(o.eta_deadline).slice(11, 16)) + ' 前</span>';
+  return '<span style="color:var(--ink-3)">—</span>';
+}
+
+/* 重印申请：用户端提交的「格式不对免费重印」，审核通过后免费重新入队 */
+let REPRINTS = [];
+const RP_LABEL = {requested: "待审核", approved: "已通过", rejected: "已驳回"};
+
+function renderReprints(){
+  const card = document.getElementById("reprint-card");
+  const list = REPRINTS.filter(r => r.reprint_status);
+  const pend = list.filter(r => r.reprint_status === "requested").length;
+  if (pend) card.style.display = "";
+  document.getElementById("rp-count").textContent = pend
+    ? (pend + " 条待处理") : (list.length + " 条记录");
+  if (!list.length) return;
+  document.getElementById("reprints").innerHTML = list.map(r => {
+    const cls = r.reprint_status === "requested" ? "warn"
+      : (r.reprint_status === "approved" ? "on" : "crit");
+    const label = RP_LABEL[r.reprint_status] || esc(r.reprint_status);
+    const ops = r.reprint_status === "requested"
+      ? '<button class="btn sm primary" onclick="approveReprint(' + r.id + ')">通过并重印</button>'
+        + ' <button class="btn sm" onclick="rejectReprint(' + r.id + ')">驳回</button>'
+      : '<span style="color:var(--ink-3)">已处理</span>';
+    return '<tr>' +
+      '<td class="m">' + esc(r.out_trade_no || ("#" + r.id)) + '</td>' +
+      '<td><span class="fn" title="' + esc(r.filename) + '">' + esc(r.filename) + '</span></td>' +
+      '<td class="m">' + esc(r.reprint_reason || "—") + '</td>' +
+      '<td><span class="pill ' + cls + '">' + label + '</span></td>' +
+      '<td>' + ops + '</td>' +
+    '</tr>';
+  }).join("");
+}
+
+async function loadReprints(){
+  try{
+    const d = await PP.api("/api/order/reprint/list");
+    REPRINTS = (d && d.requests) || [];
+    renderReprints();
+  }catch(e){
+    // 无权限或接口异常：不展示重印区块，不打扰
+  }
+}
+
+window.approveReprint = async (id) => {
+  if (!confirm("通过后立即免费重新排队打印（不计费、不收费），确认？")) return;
+  try{
+    const d = await PP.postFull("/api/order/" + id + "/reprint/approve", {});
+    alert(d.message === "success" ? "已通过，已免费重新入队打印" : (d.message || "操作失败"));
+    await loadReprints();
+    await load();
+  }catch(e){ alert(e.message); }
+};
+window.rejectReprint = async (id) => {
+  try{
+    const d = await PP.postFull("/api/order/" + id + "/reprint/reject", {});
+    if (d.message !== "success") alert(d.message || "操作失败");
+    await loadReprints();
+  }catch(e){ alert(e.message); }
+};
+
+function renderPrinterOptions(){
+  const sel = document.getElementById("f-printer");
+  const values = ["all"].concat(DEVICES.map(d => d.device_id).filter(Boolean));
+  const current = Array.from(sel.options).map(o => o.value);
+  if (current.join("|") === values.join("|")) return;
+  sel.innerHTML = values.map(v =>
+    '<option value="' + esc(v) + '">' + (v === "all" ? "全部设备" : esc(v)) + "</option>"
+  ).join("");
+  sel.value = values.includes(STATE.printer) ? STATE.printer : "all";
+  STATE.printer = sel.value;
+}
+
+function render(){
+  const all = ORDERS;
+  const today = todayStr();
+  const todayOrders = all.filter(o => (o.created_at || "").startsWith(today));
+  const todayDone = todayOrders.filter(o => o.status === "completed").length;
+  const pending = all.filter(o => o.status !== "completed").length;
+  const todayAmount = todayOrders.reduce((s, o) => s + Number(o.amount || 0), 0);
+
+  document.getElementById("k-today").textContent = todayOrders.length;
+  document.getElementById("k-today-n").textContent = "累计 " + all.length + " 单";
+  document.getElementById("k-done").textContent = todayDone;
+  document.getElementById("k-done-n").textContent = "今日完成率 " +
+    (todayOrders.length ? Math.round(todayDone / todayOrders.length * 100) : 0) + "%";
+  document.getElementById("k-done-bar").style.width =
+    (todayOrders.length ? Math.round(todayDone / todayOrders.length * 100) : 0) + "%";
+  document.getElementById("k-pending").textContent = pending;
+  document.getElementById("k-pending-n").textContent = "当前队列";
+  document.getElementById("k-amount").textContent = "¥" + todayAmount.toFixed(2);
+  document.getElementById("k-amount-n").textContent = "按下单时间统计，历史订单无金额记录时不计";
+
+  const list = filtered();
+  const pages = Math.max(1, Math.ceil(list.length / STATE.size));
+  if (STATE.page > pages) STATE.page = pages;
+  const start = (STATE.page - 1) * STATE.size;
+  const rows = list.slice(start, start + STATE.size);
+
+  document.getElementById("ord-count").textContent = list.length + " 单";
+  const body = document.getElementById("orders");
+  if (!rows.length){
+    body.innerHTML = '<tr><td colspan="11" class="empty">没有符合条件的订单</td></tr>';
+  } else {
+    body.innerHTML = rows.map(o => {
+      const s = (o.print_range_start ?? 1), e = (o.print_range_end ?? s);
+      const pages = Math.max(e - s + 1, 0);
+      const amount = (o.amount === null || o.amount === undefined)
+        ? '<span style="color:var(--ink-3)">—</span>'
+        : "¥" + Number(o.amount).toFixed(2);
+      const statusLabel = {pending: "待打印", printing: "打印中",
+        completed: "已完成", failed: "打印失败"};
+      const statusClass = {pending: "warn", printing: "warn",
+        completed: "on", failed: "crit"};
+      return `<tr>
+        <td class="m">${esc(o.out_trade_no || ("#" + o.id))}</td>
+        <td class="m">${esc(o.pickup_code || "—")}</td>
+        <td><span class="fn" title="${esc(o.filename)}">${esc(o.filename)}</span></td>
+        <td class="m">${pages}</td>
+        <td class="m">${esc(o.print_copies ?? 1)}</td>
+        <td class="m">${o.print_side === "one-sided" ? "单面" : "双面"} ·
+          ${o.print_color === "color" ? "彩色" : "黑白"}</td>
+        <td class="m">${esc(o.printer_id || "未指定")}</td>
+        <td class="amt">${amount}</td>
+        <td>${promiseCell(o)}</td>
+        <td><span class="pill ${statusClass[o.status] || "warn"}">${statusLabel[o.status] || esc(o.status)}</span>
+          ${o.status === "printing" || Number(o.progress_copies) > 0
+            ? `<div class="m" style="margin-top:4px;font-size:11.5px;color:var(--ink-3)">已提交 ${esc(o.progress_copies ?? 0)}/${esc(o.batch_bundle ? 1 : (o.print_copies ?? 1))} 份 · ${esc(o.progress_pages ?? 0)} 页</div>`
+            : ""}</td>
+        <td class="m">${esc(o.created_at || "")}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  document.getElementById("pg-info").textContent = list.length
+    ? `显示 ${start + 1}-${Math.min(start + STATE.size, list.length)} / ${list.length} 条`
+    : "共 0 条";
+  document.getElementById("pg-cur").textContent = STATE.page + " / " + pages;
+  document.getElementById("pg-prev").disabled = STATE.page <= 1;
+  document.getElementById("pg-next").disabled = STATE.page >= pages;
+}
+
+function csvCell(value){
+  let text = String(value === null || value === undefined ? "" : value);
+  // Excel 公式注入防护：以 = + - @ 开头的单元格前加单引号
+  if (/^[=+\-@]/.test(text)) text = "'" + text;
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
+function exportCsv(){
+  const rows = filtered();
+  const head = ["订单号","取件码","文件","页数","份数","方式","色彩","打印机","金额","状态","提交时间"];
+  const statusLabel = {pending: "待打印", printing: "打印中",
+    completed: "已完成", failed: "打印失败"};
+  const data = rows.map(o => {
+    const s = (o.print_range_start ?? 1), e = (o.print_range_end ?? s);
+    return [o.out_trade_no || ("#" + o.id), o.pickup_code || "",
+      o.filename, e - s + 1, o.print_copies ?? 1,
+      o.print_side === "one-sided" ? "单面" : "双面",
+      o.print_color === "color" ? "彩色" : "黑白",
+      o.printer_id || "未指定",
+      o.amount == null ? "" : Number(o.amount).toFixed(2),
+      statusLabel[o.status] || o.status, o.created_at || ""];
+  });
+  const csv = "\ufeff" + [head].concat(data).map(r =>
+    r.map(csvCell).join(",")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv;charset=utf-8"}));
+  a.download = "orders-" + todayStr() + ".csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：页面不含内置密钥，请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const [od, dv] = await Promise.all([
+      PP.api("/api/order/list"), PP.api("/api/device/list"),
+    ]);
+    ORDERS = od.orders || [];
+    DEVICES = dv.devices || [];
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    renderPrinterOptions();
+    render();
+    loadReprints();
+    PP.setCounts({ orders: ORDERS.filter(o => o.status !== "completed").length });
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+
+document.getElementById("q").oninput = () => { STATE.q = document.getElementById("q").value.trim(); STATE.page = 1; render(); };
+document.getElementById("f-status").onchange = e => { STATE.status = e.target.value; STATE.page = 1; render(); };
+document.getElementById("f-printer").onchange = e => { STATE.printer = e.target.value; STATE.page = 1; render(); };
+document.getElementById("f-range").onchange = e => { STATE.range = e.target.value; STATE.page = 1; render(); };
+document.getElementById("pg-prev").onclick = () => { if (STATE.page > 1){ STATE.page--; render(); } };
+document.getElementById("pg-next").onclick = () => { STATE.page++; render(); };
+document.getElementById("btn-csv").onclick = exportCsv;
+
+PP.boot(load);
+</script>
+</body>
+</html>

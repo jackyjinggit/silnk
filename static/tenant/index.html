@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 租户控制台</title>
+<link rel="stylesheet" href="/admin/assets/admin.css?v=2">
+<style>
+  .tbar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+  .tbar .b{background:var(--white);padding:16px 20px}
+  .tbar .b .k{font-size:12.5px;color:var(--ink-2);font-weight:600}
+  .tbar .b .v{font-family:var(--num);font-size:24px;font-weight:800;margin-top:6px;color:var(--ink);
+    font-variant-numeric:tabular-nums}
+  .tbar .b .v small{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-left:5px}
+  .tbar .b .n{font-size:12px;color:var(--ink-3);margin-top:5px;font-family:var(--num)}
+  @media(max-width:900px){.tbar{grid-template-columns:1fr 1fr}}
+  .alrow{display:flex;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line)}
+  .alrow:last-child{border-bottom:0}
+  .alrule{flex:0 0 auto;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+  .alrule.crit{background:var(--crit-bg);color:var(--crit)}
+  .alrule.warn{background:var(--warn-bg);color:var(--warn)}
+  .alm{font-size:11.5px;color:var(--ink-2);margin-top:3px;line-height:1.5}
+  .alt{font-size:12.5px;font-weight:600}
+  .alt .alage{font-weight:400;color:var(--ink-3);margin-left:6px;font-size:11.5px}
+  .pill.res{background:var(--bg);color:var(--ink-3)}
+</style>
+</head>
+<body data-page="overview">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">租户控制台</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem active" data-page="overview" href="#sec-sub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="revenue" href="#sec-rev">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        营收与结算</a>
+      <a class="sitem" data-page="price" href="#sec-price">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        本租户定价</a>
+      <a class="sitem" data-page="devices" href="#sec-dev">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="#sec-orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="alerts" href="#sec-alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+    </nav>
+    <div class="sfoot">思印客 Silnk · 租户控制台<br><span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1 id="t-name">租户控制台</h1>
+        <div class="crumb" id="t-crumb">本租户的设备、订单与告警</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">租户密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal" id="sec-sub">
+        <div class="ch"><h3>订阅与点位</h3><span class="c" id="sub-note">—</span></div>
+        <div class="tbar">
+          <div class="b"><div class="k">租户 ID</div><div class="v" id="s-id">—</div></div>
+          <div class="b"><div class="k">套餐</div><div class="v" id="s-plan">—</div></div>
+          <div class="b"><div class="k">打印机上限</div><div class="v" id="s-limit">—</div>
+            <div class="n" id="s-limit-n">—</div></div>
+          <div class="b"><div class="k">订阅到期</div><div class="v" id="s-exp">—</div>
+            <div class="n" id="s-exp-n">—</div></div>
+        </div>
+        <div class="tfoot">
+          <div class="fnote">
+            订阅状态由平台方维护（续期 / 改套餐 / 停用）。<b>自助开通、自动计费为待做</b>，当前不可在页面自助续费；
+            密钥停用后本页会立即无法登录。
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis reveal">
+        <div class="kpi"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10"/></svg></span>设备总数</div>
+          <div class="v" id="k-dev">–</div><div class="n" id="k-dev-n">等待数据</div></div>
+        <div class="kpi"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg></span>在线设备</div>
+          <div class="v" id="k-online">–</div><div class="n" id="k-online-n">等待数据</div></div>
+        <div class="kpi"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>未完成订单</div>
+          <div class="v" id="k-order">–</div><div class="n" id="k-order-n">等待数据</div></div>
+        <div class="kpi accent"><div class="k"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg></span>未处理告警</div>
+          <div class="v" id="k-alert">–</div><div class="n" id="k-alert-n">等待数据</div></div>
+      </div>
+
+      <div class="card reveal" id="sec-rev">
+        <div class="ch"><h3>营收与结算</h3><span class="c" id="rev-note">—</span></div>
+        <div class="tbar">
+          <div class="b"><div class="k">今日营收</div><div class="v" id="rev-today">—</div>
+            <div class="n" id="rev-today-n">—</div></div>
+          <div class="b"><div class="k">本月营收</div><div class="v" id="rev-month">—</div>
+            <div class="n" id="rev-month-n">—</div></div>
+          <div class="b"><div class="k">累计营收</div><div class="v" id="rev-total">—</div>
+            <div class="n" id="rev-total-n">—</div></div>
+          <div class="b"><div class="k">未结算应结</div><div class="v" id="rev-unsettled">—</div>
+            <div class="n" id="rev-unsettled-n">—</div></div>
+        </div>
+        <div class="tfoot">
+          <div class="fnote">
+            平台抽成 <b id="rev-rate">—</b> · 累计抽成 <b id="rev-fee">—</b> · 累计应结 <b id="rev-net">—</b><br>
+            用户入口（把链接或二维码放到点位）：<span id="rev-entry">—</span>
+            <button class="btn sm" id="rev-copy" type="button">复制链接</button><br>
+            结算由平台方发起：<span id="rev-settled">暂无结算记录</span>。系统只记账，真实打款线下完成。
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal" id="sec-price">
+        <div class="ch"><h3>本租户默认单价</h3><span class="c" id="price-src">—</span></div>
+        <div class="form on">
+          <div class="fgrid">
+            <div class="fg">
+              <label>单面黑白（元/页）</label>
+              <input id="p-bw" type="number" min="0.01" step="0.01" placeholder="跟随平台全局价">
+            </div>
+            <div class="fg">
+              <label>单面彩色（元/页）</label>
+              <input id="p-color" type="number" min="0.01" step="0.01" placeholder="跟随平台全局价">
+            </div>
+            <div class="fg">
+              <label>双面黑白（元/张）</label>
+              <input id="p-bw-duplex" type="number" min="0.01" step="0.01" placeholder="跟随平台全局价">
+            </div>
+            <div class="fg">
+              <label>双面彩色（元/张）</label>
+              <input id="p-color-duplex" type="number" min="0.01" step="0.01" placeholder="跟随平台全局价">
+            </div>
+          </div>
+          <div class="factions">
+            <button class="btn primary" id="p-save">保存本租户价</button>
+            <span class="fmsg" id="p-msg"></span>
+          </div>
+          <div class="fnote" id="p-note">—</div>
+        </div>
+      </div>
+
+      <div class="card reveal" id="sec-dev">
+        <div class="ch"><h3>本租户设备</h3><span class="c" id="dev-summary">—</span></div>
+        <div class="wrap">
+          <table>
+            <thead><tr><th>设备</th><th>状态</th><th>纸张</th><th>队列</th><th>最后心跳</th></tr></thead>
+            <tbody id="dev-body"><tr><td colspan="5" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card reveal" id="sec-orders">
+        <div class="ch"><h3>本租户订单</h3><span class="c" id="ord-count">0 单</span></div>
+        <div class="wrap">
+          <table>
+            <thead><tr>
+              <th>订单</th><th>取件码</th><th>文件</th><th>页数</th><th>份数</th><th>方式</th>
+              <th>打印机</th><th>金额</th><th>状态</th><th>提交时间</th>
+            </tr></thead>
+            <tbody id="ord-body"><tr><td colspan="10" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="tfoot"><div class="fnote">仅展示本租户设备产生的订单，最新 50 单。</div></div>
+      </div>
+
+      <div class="card reveal" id="sec-alerts">
+        <div class="ch"><h3>本租户告警</h3><span class="c" id="al-summary">—</span></div>
+        <div id="al-body"><div class="empty">等待数据…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">租户密钥</div>
+    <div class="mb">
+      <p>请输入平台方交付给你的租户密钥。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="租户密钥（sk_…）" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* 租户控制台：只用租户密钥调 /api/tenant/self/*，拿不到其他租户的数据。
+   密钥存在 localStorage 的 pp_tenant_key，页面源码里没有任何默认密钥。 */
+const KEY_STORE = "pp_tenant_key";
+let KEY = localStorage.getItem(KEY_STORE) || "";
+let serverNow = null;
+const OFFLINE_SECONDS = 60;
+
+const esc = s => String(s === null || s === undefined ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function fmtAge(sec){
+  if (sec === null || sec === undefined) return "—";
+  if (sec < 0) sec = 0;
+  if (sec < 60) return sec + " 秒前";
+  if (sec < 3600) return Math.floor(sec / 60) + " 分钟前";
+  if (sec < 86400) return Math.floor(sec / 3600) + " 小时前";
+  return Math.floor(sec / 86400) + " 天前";
+}
+function ageOf(ts){
+  if (!ts || !serverNow) return null;
+  const t = typeof ts === "number" ? ts * 1000 : Date.parse(String(ts).replace(" ", "T"));
+  if (isNaN(t)) return null;
+  return Math.round((serverNow - t) / 1000);
+}
+function onlineInfo(d){
+  const age = ageOf(d.last_heartbeat);
+  const stale = d.status === "online" && age !== null && age > OFFLINE_SECONDS;
+  return { age, stale, online: d.status === "online" && !stale };
+}
+
+async function api(path, opts){
+  const o = opts || {};
+  const res = await fetch(path, Object.assign({}, o, {
+    headers: Object.assign({ Authorization: "Bearer " + KEY }, o.headers || {}),
+  }));
+  const d = res.headers.get("date");
+  if (d) serverNow = new Date(d).getTime();
+  if (res.status === 401) throw new Error("租户密钥无效或已停用（401）");
+  if (!res.ok) throw new Error(path + " 返回 " + res.status);
+  return (await res.json()).data;
+}
+async function post(path, payload){
+  return api(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload || {}),
+  });
+}
+async function postFull(path, payload){
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" },
+    body: JSON.stringify(payload || {}),
+  });
+  if (res.status === 401) throw new Error("租户密钥无效或已停用（401）");
+  if (!res.ok) throw new Error(path + " 返回 " + res.status);
+  return await res.json();
+}
+
+function showErr(msg){
+  const el = document.getElementById("err");
+  if (!msg){ el.classList.remove("on"); return; }
+  el.innerHTML = "<b>接口异常</b> — " + esc(msg);
+  el.classList.add("on");
+}
+function setLive(ok, text){
+  document.getElementById("live").classList.toggle("bad", !ok);
+  document.getElementById("livetxt").textContent = text;
+}
+
+/* 订阅与点位：套餐 / 上限 / 到期，全部来自后端真实订阅表，不做假数据 */
+function renderSub(d){
+  const t = (d && d.tenant) || {};
+  const sub = t.subscription || {};
+  document.getElementById("t-name").textContent = t.name || "租户控制台";
+  document.getElementById("t-crumb").textContent = "租户 ID " + (t.tenant_id || "—") +
+    " · 本租户的设备、订单与告警";
+  document.getElementById("t-name").setAttribute("data-tid", t.tenant_id || "");
+  document.getElementById("s-id").textContent = t.tenant_id || "—";
+  document.getElementById("s-plan").textContent = d.plan || "—";
+  const limit = d.printer_limit;
+  document.getElementById("s-limit").innerHTML = limit
+    ? esc(String(limit)) + "<small>台</small>" : "<small>不限量</small>";
+  document.getElementById("s-limit-n").textContent = limit
+    ? ("已接入 " + (d.devices_total || 0) + " 台") : "未设上限";
+  document.getElementById("s-exp").textContent = sub.expires_at || "不限期";
+  document.getElementById("s-exp-n").textContent = sub.expires_at
+    ? (d.expired ? "已到期，请联系平台方续期" : "有效") : "不限期";
+  const svc = d.service || {};
+  document.getElementById("sub-note").innerHTML = !svc.active
+    ? '<span class="pill crit">' + esc(svc.reason || "服务暂停") + '</span>'
+    : '<span class="pill on">订阅生效中</span>';
+  // 订阅不可用时禁止改价，后端同样会拒绝
+  const save = document.getElementById("p-save");
+  save.disabled = !svc.active;
+  save.title = svc.active ? "" : ("订阅不可用：" + (svc.reason || ""));
+}
+
+function renderRevenue(rev, service){
+  const r = rev || {};
+  const money = v => "¥" + Number(v || 0).toFixed(2);
+  const today = r.today || {}, month = r.month || {}, total = r.total || {};
+  const unsettled = r.unsettled || {};
+  document.getElementById("rev-today").textContent = money(today.amount);
+  document.getElementById("rev-today-n").textContent = (today.orders || 0) + " 单";
+  document.getElementById("rev-month").textContent = money(month.amount);
+  document.getElementById("rev-month-n").textContent = (month.orders || 0) + " 单";
+  document.getElementById("rev-total").textContent = money(total.amount);
+  document.getElementById("rev-total-n").textContent = (total.orders || 0) + " 单累计";
+  document.getElementById("rev-unsettled").textContent = money(unsettled.net);
+  document.getElementById("rev-unsettled-n").textContent =
+    unsettled.orders ? (unsettled.orders + " 单待结 · 流水 " + money(unsettled.amount)) : "已结清";
+  document.getElementById("rev-rate").textContent =
+    (Number(r.fee_rate || 0) * 100).toFixed(0) + "%";
+  document.getElementById("rev-fee").textContent = money(r.fee_total);
+  document.getElementById("rev-net").textContent = money(r.net_total);
+  document.getElementById("rev-note").innerHTML = unsettled.orders
+    ? '<span class="pill warn">' + unsettled.orders + ' 单待结算</span>'
+    : '<span class="pill on">已结清</span>';
+  const entry = window.location.origin + "/?t=" + encodeURIComponent((service || {}).tenant_id || "");
+  document.getElementById("rev-entry").textContent = entry;
+  document.getElementById("rev-copy").onclick = async () => {
+    try{
+      await navigator.clipboard.writeText(entry);
+      document.getElementById("rev-copy").textContent = "已复制";
+      setTimeout(() => { document.getElementById("rev-copy").textContent = "复制链接"; }, 1500);
+    }catch(e){
+      window.prompt("复制这个链接", entry);
+    }
+  };
+  const list = r.settlements || [];
+  document.getElementById("rev-settled").textContent = list.length
+    ? ("最近一次 " + (list[0].settled_at || "") + " · " + list[0].orders + " 单 · 应结 ¥" +
+       Number(list[0].net || 0).toFixed(2) + "（共 " + list.length + " 批）")
+    : "暂无结算记录";
+}
+
+const PRICE_INPUTS = ["p-bw", "p-color", "p-bw-duplex", "p-color-duplex"];
+const KEY_OF = id => id.replace("p-", "").replace(/-/g, "_");
+let priceSig = "";
+
+function renderPrice(d){
+  const own = d.price || {};
+  const g = d.global_price || {};
+  const ae = document.activeElement;
+  const editing = ae && PRICE_INPUTS.includes(ae.id);
+  const sig = PRICE_INPUTS.map(id => (own[KEY_OF(id)] ?? "")).join("/");
+  if (!editing && sig !== priceSig){
+    priceSig = sig;
+    PRICE_INPUTS.forEach(id => {
+      const v = own[KEY_OF(id)];
+      document.getElementById(id).value = (v === null || v === undefined) ? "" : v;
+    });
+  }
+  const hasOwn = PRICE_INPUTS.some(id => own[KEY_OF(id)] !== null && own[KEY_OF(id)] !== undefined);
+  document.getElementById("price-src").innerHTML = hasOwn
+    ? '<span class="pill on">已设本租户价</span>'
+    : '<span class="pill off">跟随平台全局价</span>';
+  const line = x => "单面 黑白 " + x.bw + " / 彩色 " + x.color + " 元/页 · 双面 黑白 " +
+    x.bw_duplex + " / 彩色 " + x.color_duplex + " 元/张";
+  document.getElementById("p-note").innerHTML =
+    "本租户各机实际结算价依次取：<b>设备独立价 &gt; 本租户默认价 &gt; 平台全局价</b>。" +
+    (hasOwn ? "当前本租户价：" + line(own) + "。" : "当前本租户未单独定价，实际按平台全局价结算。") +
+    "<br>平台全局价：" + line(g) +
+    "<br>只填部分项保存时，未填项保持原值；留空表示该项未设本租户价。单面按页、双面按张计价，历史订单金额不追溯。";
+}
+
+async function savePrice(){
+  const msg = document.getElementById("p-msg");
+  const body = {};
+  PRICE_INPUTS.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    if (v !== "") body[KEY_OF(id)] = Number(v);
+  });
+  if (!Object.keys(body).length){
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：至少填一项单价（留空即保持原值）";
+    return;
+  }
+  const btn = document.getElementById("p-save");
+  btn.disabled = true;
+  msg.style.color = "var(--ink-2)";
+  msg.textContent = "保存中…";
+  try{
+    const r = await postFull("/api/tenant/self/price", body);
+    if (r.message !== "success") throw new Error(r.message || "保存失败");
+    const p = r.data.price || {};
+    msg.style.color = "var(--ok)";
+    msg.textContent = "已保存本租户价：单面 黑白 " + p.bw + " / 彩色 " + p.color +
+      " 元/页，双面 黑白 " + p.bw_duplex + " / 彩色 " + p.color_duplex + " 元/张（仅影响本租户设备）";
+    priceSig = "";
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    load();
+  }catch(e){
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：" + e.message;
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function renderDevices(devices, orders){
+  const online = devices.filter(d => onlineInfo(d).online).length;
+  document.getElementById("dev-summary").textContent = devices.length + " 台 · 在线 " + online;
+  const body = document.getElementById("dev-body");
+  if (!devices.length){
+    body.innerHTML = '<tr><td colspan="5" class="empty">尚无设备 —— 打印机客户端按本租户 TENANT_ID 接入后出现在这里</td></tr>';
+    return;
+  }
+  body.innerHTML = devices.map(d => {
+    const info = onlineInfo(d);
+    const cap = Number(d.paper_capacity || 0);
+    const left = Number(d.paper_left || 0);
+    const pct = cap ? Math.max(0, Math.min(100, Math.round(left / cap * 100))) : 0;
+    const queue = orders.filter(o =>
+      o.status !== "completed" && (o.printer_id || "") === d.device_id).length;
+    return `<tr>
+      <td><div style="font-weight:700">${esc(d.device_id)}</div>
+        <div style="font-size:11.5px;color:var(--ink-3)">${esc(d.name || d.model || "")}</div></td>
+      <td><span class="pill ${info.online ? "on" : "off"}">${info.online ? "在线" : "离线"}</span></td>
+      <td class="m">${cap ? left + "/" + cap + "（" + pct + "%）" : "—"}</td>
+      <td class="m">${queue}</td>
+      <td class="m">${info.age === null ? "—" : fmtAge(info.age)}</td>
+    </tr>`;
+  }).join("");
+}
+
+const STATUS_LABEL = {pending: "待打印", printing: "打印中", completed: "已完成", failed: "打印失败"};
+const STATUS_CLASS = {pending: "warn", printing: "warn", completed: "on", failed: "crit"};
+
+function renderOrders(orders){
+  document.getElementById("ord-count").textContent = orders.length + " 单";
+  const body = document.getElementById("ord-body");
+  const rows = orders.slice().sort((a, b) => b.id - a.id).slice(0, 50);
+  if (!rows.length){
+    body.innerHTML = '<tr><td colspan="10" class="empty">本租户还没有订单</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(o => {
+    const s = (o.print_range_start ?? 1), e = (o.print_range_end ?? s);
+    const pages = Math.max(e - s + 1, 0);
+    const amount = (o.amount === null || o.amount === undefined)
+      ? '<span style="color:var(--ink-3)">—</span>' : "¥" + Number(o.amount).toFixed(2);
+    return `<tr>
+      <td class="m">${esc(o.out_trade_no || ("#" + o.id))}</td>
+      <td class="m">${esc(o.pickup_code || "—")}</td>
+      <td><span class="fn" title="${esc(o.filename)}">${esc(o.filename)}</span></td>
+      <td class="m">${pages}</td>
+      <td class="m">${esc(o.print_copies ?? 1)}</td>
+      <td class="m">${o.print_side === "one-sided" ? "单面" : "双面"} · ${o.print_color === "color" ? "彩色" : "黑白"}</td>
+      <td class="m">${esc(o.printer_id || "未指定")}</td>
+      <td class="m">${amount}</td>
+      <td><span class="pill ${STATUS_CLASS[o.status] || "warn"}">${STATUS_LABEL[o.status] || esc(o.status)}</span></td>
+      <td class="m">${esc(o.created_at || "")}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderAlerts(alerts){
+  const open = alerts.filter(a => !a.resolved_at);
+  document.getElementById("al-summary").textContent =
+    open.length ? (open.length + " 条未处理 · 累计 " + alerts.length + " 条") : ("无未处理 · 累计 " + alerts.length + " 条");
+  const host = document.getElementById("al-body");
+  if (!alerts.length){
+    host.innerHTML = '<div class="empty">本租户暂无告警记录</div>';
+    return;
+  }
+  host.innerHTML = alerts.slice().sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 20).map(a => {
+    const level = a.level === "critical" ? "crit" : "warn";
+    const age = ageOf(a.triggered_at);
+    return `<div class="alrow">
+      <span class="alrule ${level}">${esc(a.rule)}</span>
+      <div style="min-width:0">
+        <div class="alt">${esc(a.device_id)}
+          <span class="alage">${age === null ? "" : fmtAge(age)}</span>
+          ${a.resolved_at ? '<span class="pill res">已恢复</span>' : ""}</div>
+        <div class="alm">${esc(a.message)}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function load(){
+  if (!KEY){
+    setLive(false, "未配置密钥");
+    showErr("未配置租户密钥：请点右上角「租户密钥」输入平台方交付的密钥（sk_…）");
+    return;
+  }
+  try{
+    const [self, dv, od, al] = await Promise.all([
+      api("/api/tenant/self"), api("/api/tenant/self/devices"),
+      api("/api/tenant/self/orders"), api("/api/tenant/self/alerts"),
+    ]);
+    showErr(null);
+    setLive(true, "实时");
+    renderSub(self);
+    renderRevenue(self.revenue, self.service);
+    renderPrice(self);
+    const devices = dv.devices || [], orders = od.orders || [], alerts = al.alerts || [];
+    const online = devices.filter(d => onlineInfo(d).online).length;
+    const openAlerts = alerts.filter(a => !a.resolved_at);
+    document.getElementById("k-dev").textContent = devices.length;
+    document.getElementById("k-dev-n").textContent = devices.length ? "本租户全部设备" : "尚无设备";
+    document.getElementById("k-online").innerHTML = online + "<small>/" + devices.length + "</small>";
+    document.getElementById("k-online-n").textContent = devices.length ? (devices.length - online) + " 台离线" : "尚无设备";
+    document.getElementById("k-order").textContent = orders.filter(o => o.status !== "completed").length;
+    document.getElementById("k-order-n").textContent = orders.length ? "累计 " + orders.length + " 单" : "暂无订单";
+    document.getElementById("k-alert").textContent = openAlerts.length;
+    document.getElementById("k-alert-n").textContent = alerts.length ? "累计 " + alerts.length + " 条" : "无告警记录";
+    document.getElementById("nav-dev").textContent = devices.length;
+    document.getElementById("nav-ord").textContent = orders.length;
+    document.getElementById("nav-al").textContent = openAlerts.length;
+    renderDevices(devices, orders);
+    renderOrders(orders);
+    renderAlerts(alerts);
+  }catch(e){
+    setLive(false, "断开");
+    showErr(e.message);
+  }
+}
+
+/* ---------------- 顶栏 / 时钟 / 密钥弹窗 ---------------- */
+function initClock(){
+  const tick = () => {
+    const n = new Date();
+    document.getElementById("clock").textContent =
+      String(n.getHours()).padStart(2, "0") + ":" + String(n.getMinutes()).padStart(2, "0") + ":" + String(n.getSeconds()).padStart(2, "0");
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
+function initModal(){
+  const mask = document.getElementById("mask");
+  const hint = () => {
+    document.getElementById("key-hint").textContent = KEY ? (KEY.slice(0, 8) + "…") : "未配置";
+  };
+  document.getElementById("btn-key").onclick = () => {
+    document.getElementById("key-input").value = KEY;
+    hint();
+    mask.classList.add("on");
+    setTimeout(() => document.getElementById("key-input").focus(), 30);
+  };
+  document.getElementById("key-cancel").onclick = () => mask.classList.remove("on");
+  document.getElementById("key-save").onclick = () => {
+    const v = document.getElementById("key-input").value.trim();
+    if (v){ KEY = v; localStorage.setItem(KEY_STORE, v); }
+    mask.classList.remove("on");
+    load();
+  };
+  mask.addEventListener("click", ev => { if (ev.target === mask) mask.classList.remove("on"); });
+}
+
+document.querySelectorAll(".snav .sitem").forEach(a => {
+  a.addEventListener("click", () => {
+    document.querySelectorAll(".snav .sitem").forEach(x => x.classList.toggle("active", x === a));
+  });
+});
+
+document.getElementById("f-host").textContent = location.host || "本地文件";
+document.getElementById("btn-refresh").onclick = () => load();
+document.getElementById("p-save").onclick = savePrice;
+initClock();
+initModal();
+load();
+setInterval(load, 5000);
+</script>
+</body>
+</html>

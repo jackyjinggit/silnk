@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 运行时数据（含用户文件、订单、设备数据，绝不入库）
+printer.db
+printer.db-*
+backups/
+uploads/
+pending_files/
+reprint_cache/
+client/downloads/
+*.log
+# 共享资料库：待审文件与已公开文件都含用户内容，绝不入库
+library_pending/
+static/library/files/
+
+# 敏感/本地配置（仓库只保留示例）
+.env
+.env.*
+*.bak
+client/start_win.bat
+# 零配置接入生成的设备令牌，绝不入库
+client/config.json
+client/config.json.bak
+setting.local.py
+ops_key.txt
+
+# 支付收款码（不要公开）
+static/pay/wechat_qr.png
+
+# 临时脚本与打包产物
+_tmp_*
+client.zip
+
+# 前端依赖与构建缓存
+front/node_modules/
+front/.vite/
+front/dist/
+
+# 教程动图体积过大（单个数十 MB），不入库；部署时单独放到对应目录
+front/public/static/tutorial/*.gif
+front/src/assets/tutorial/*.gif
+static/app/dist/static/tutorial/*.gif
+
+# 编辑器/系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 原项目遗留的子模块配置（pdfjs 目录已不存在）
+.gitmodules
+
+# 运行数据库（含订单/取件码，脱敏扫描标记，禁止入仓）
+printer.db
+*.db
+*.sqlite
+*.sqlite3

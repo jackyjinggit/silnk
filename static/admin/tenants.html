@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 租户与结算</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+<style>
+  .tcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff}
+  .tcard:last-child{margin-bottom:0}
+  .thead{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .thead b{font-size:14px;font-weight:600}
+  .tm{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.7}
+  .trev{display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;padding:9px 11px;
+    background:#F7F9FE;border-radius:8px;font-size:12px;color:var(--ink-2)}
+  .trev b{font-family:var(--num);font-size:13px;color:var(--ink)}
+  .tedit{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .tedit label{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:5px}
+  .tedit input{height:30px;width:88px;padding:0 8px;border:1px solid var(--line);
+    border-radius:7px;font:inherit;font-size:12px;color:var(--ink);background:#fff;outline:none}
+  .tedit input:focus{border-color:var(--blue)}
+  .tacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .btn.danger{border-color:#F3C9C9;color:#D9483B;background:#FFF6F6}
+  .create{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px 16px}
+  .create input{height:34px;padding:0 10px;border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:12.5px;background:#fff;color:var(--ink);outline:none}
+  .create input:focus{border-color:var(--blue)}
+  .create .full{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .cmsg{padding:0 16px 12px;font-size:12px;color:var(--ink-3);min-height:18px;line-height:1.7}
+  .cmsg.ok{color:var(--ok)}
+  .cmsg.bad{color:var(--crit)}
+  .secret{padding:10px 16px 14px}
+  .secret code{display:block;padding:10px 12px;background:#F2F6FF;border:1px dashed var(--blue-100);
+    border-radius:8px;font-size:12.5px;word-break:break-all;color:var(--blue-700)}
+  @media (max-width:900px){.create{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body data-page="tenants">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem active" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>租户与结算</h1>
+        <div class="crumb">订阅生效 / 设备配额 / 平台抽成与结算。真实打款线下完成，系统只记账</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal" style="margin-bottom:14px">
+        <div class="ch">
+          <h3>开通租户</h3>
+          <span class="c">开通后把密钥与用户入口交付给客户</span>
+        </div>
+        <div class="create">
+          <input id="n-id" type="text" maxlength="24" placeholder="租户 ID（英文/数字，如 deke）">
+          <input id="n-name" type="text" maxlength="40" placeholder="名称（如 德科文印室）">
+          <input id="n-contact" type="text" maxlength="40" placeholder="联系方式（可选）">
+          <input id="n-plan" type="text" maxlength="20" placeholder="套餐名，如 starter">
+          <input id="n-limit" type="number" min="0" step="1" placeholder="打印机上限（0=不限）">
+          <input id="n-fee" type="number" min="0" max="100" step="1" placeholder="平台抽成 %（默认 10）">
+          <input id="n-exp" type="date" placeholder="订阅到期（可空）">
+          <div class="full">
+            <button class="btn primary" id="n-create" type="button">开通租户</button>
+            <span class="cmsg" id="n-msg">新租户默认 10% 抽成，可开通后调整。</span>
+          </div>
+        </div>
+        <div class="secret" id="n-secret" style="display:none"></div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch">
+          <h3>租户列表</h3>
+          <span class="c" id="t-count">0 个</span>
+        </div>
+        <div style="padding:14px 16px 16px" id="t-list">
+          <div class="empty">等待数据…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+
+/* 需要读取后端业务 message（失败原因），所以不走 PP.api 的 data 裁剪 */
+async function apiFull(path, opts){
+  const o = opts || {};
+  const headers = Object.assign(
+    { Authorization: "Bearer " + PP.getKey() }, o.headers || {});
+  const res = await fetch(path, Object.assign({}, o, { headers }));
+  if (res.status === 401) throw new Error("密钥无效（401）");
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.message || ("HTTP " + res.status));
+  return body;
+}
+
+function msg(text, cls){
+  const el = document.getElementById("n-msg");
+  el.className = "cmsg" + (cls ? " " + cls : "");
+  el.textContent = text;
+}
+
+function money(v){ return "¥" + Number(v || 0).toFixed(2); }
+
+function tenantCard(t, rev){
+  const sub = t.subscription || {};
+  const id = t.tenant_id;
+  const active = t.status === "active" && (sub.status || "active") === "active";
+  const limit = sub.printer_limit;
+  const feePct = Math.round(Number((rev && rev.fee_rate) || sub.fee_rate || 0) * 100);
+  const entry = window.location.origin + "/?t=" + encodeURIComponent(id);
+  const r = rev || {};
+  const unsettled = r.unsettled || {};
+  return `<div class="tcard" data-tid="${esc(id)}">
+    <div class="thead">
+      <b>${esc(t.name || id)}</b>
+      <span class="pill">${esc(id)}</span>
+      <span class="pill ${active ? "ok" : "crit"}">${active ? "生效中" : "已停用"}</span>
+      <span class="pill">${esc(sub.plan || "—")}</span>
+      <span class="pill">${limit ? ("上限 " + limit + " 台") : "不限台数"}</span>
+    </div>
+    <div class="tm">
+      到期 ${esc(sub.expires_at || "不限期")} · 抽成 ${feePct}% ·
+      用户入口 <a href="${esc(entry)}" target="_blank" rel="noopener">${esc(entry)}</a>
+    </div>
+    <div class="trev">
+      <span>今日 <b>${money((r.today || {}).amount)}</b> / ${((r.today || {}).orders || 0)} 单</span>
+      <span>本月 <b>${money((r.month || {}).amount)}</b> / ${((r.month || {}).orders || 0)} 单</span>
+      <span>累计 <b>${money((r.total || {}).amount)}</b> / ${((r.total || {}).orders || 0)} 单</span>
+      <span>待结 <b>${money(unsettled.net)}</b> / ${unsettled.orders || 0} 单</span>
+      <span>累计抽成 <b>${money(r.fee_total)}</b></span>
+    </div>
+    <div class="tedit">
+      <label>套餐 <input data-f="plan" type="text" maxlength="20" value="${esc(sub.plan || "")}"></label>
+      <label>上限 <input data-f="limit" type="number" min="0" step="1" value="${limit == null ? 0 : limit}"></label>
+      <label>到期 <input data-f="exp" type="date" value="${esc((sub.expires_at || "").slice(0, 10))}"></label>
+      <label>抽成% <input data-f="fee" type="number" min="0" max="100" step="1" value="${feePct}"></label>
+    </div>
+    <div class="tacts">
+      <button class="btn sm primary" data-save type="button">保存订阅</button>
+      <button class="btn sm" data-settle type="button">结算待结</button>
+      <button class="btn sm ${active ? "danger" : ""}" data-toggle type="button">${active ? "停用租户" : "启用租户"}</button>
+    </div>
+  </div>`;
+}
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const data = await PP.api("/api/tenant/list");
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    const tenants = data.tenants || [];
+    const revenues = await Promise.all(tenants.map(t =>
+      PP.api("/api/tenant/" + encodeURIComponent(t.tenant_id) + "/revenue").catch(() => null)));
+    document.getElementById("t-count").textContent = tenants.length + " 个";
+    document.getElementById("t-list").innerHTML = tenants.length
+      ? tenants.map((t, i) => tenantCard(t, revenues[i])).join("")
+      : '<div class="empty">还没有租户</div>';
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+
+document.getElementById("n-create").addEventListener("click", async () => {
+  const btn = document.getElementById("n-create");
+  const tid = document.getElementById("n-id").value.trim();
+  if (!PP.getKey()){ msg("请先配置管理端密钥", "bad"); return; }
+  if (!tid){ msg("请填写租户 ID", "bad"); return; }
+  const fee = Number(document.getElementById("n-fee").value || 10);
+  const limit = Number(document.getElementById("n-limit").value || 0);
+  const payload = {
+    tenant_id: tid,
+    name: document.getElementById("n-name").value.trim(),
+    contact: document.getElementById("n-contact").value.trim(),
+    plan: document.getElementById("n-plan").value.trim() || "starter",
+    printer_limit: limit,
+    fee_rate: fee / 100,
+    expires_at: document.getElementById("n-exp").value || null
+  };
+  btn.disabled = true;
+  msg("开通中…");
+  try{
+    const body = await apiFull("/api/tenant/create", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (body.message !== "success"){
+      msg(body.message || "开通失败", "bad");
+    } else {
+      const t = body.data.tenant || {};
+      msg("已开通，密钥只显示这一次，请立即交付客户", "ok");
+      const box = document.getElementById("n-secret");
+      box.style.display = "block";
+      box.innerHTML = `<div class="tm">租户 <b>${esc(t.tenant_id)}</b> 密钥：</div>
+        <code>${esc(t.secret_key)}</code>
+        <div class="tm">用户入口：${esc(window.location.origin + "/?t=" + encodeURIComponent(t.tenant_id))}</div>`;
+      ["n-id", "n-name", "n-contact", "n-plan", "n-limit", "n-fee", "n-exp"]
+        .forEach(id => { document.getElementById(id).value = ""; });
+      load();
+    }
+  }catch(e){
+    msg("开通失败：" + e.message, "bad");
+  }
+  btn.disabled = false;
+});
+
+document.getElementById("t-list").addEventListener("click", async (ev) => {
+  const card = ev.target.closest(".tcard");
+  if (!card) return;
+  const tid = card.getAttribute("data-tid");
+  const btn = ev.target;
+  try{
+    if (btn.hasAttribute("data-save")){
+      const val = f => card.querySelector('[data-f="' + f + '"]').value;
+      const body = await apiFull("/api/tenant/" + encodeURIComponent(tid) + "/subscription", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: val("plan") || null,
+          printer_limit: Number(val("limit") || 0),
+          expires_at: val("exp") || null,
+          fee_rate: Number(val("fee") || 0) / 100
+        })
+      });
+      if (body.message !== "success") throw new Error(body.message || "保存失败");
+      PP.showErr(null);
+      load();
+      return;
+    }
+    if (btn.hasAttribute("data-settle")){
+      if (!window.confirm("确认结算该租户所有已付款未结算订单？")) return;
+      const body = await apiFull("/api/tenant/" + encodeURIComponent(tid) + "/settle", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note: "管理端手动结算" })
+      });
+      if (body.message === "success"){
+        PP.showErr(null);
+        window.alert("已结算 " + body.data.orders + " 单，流水 " + money(body.data.amount) +
+                     "，抽成 " + money(body.data.fee) + "，应结 " + money(body.data.net));
+      } else {
+        window.alert(body.message || "没有待结算订单");
+      }
+      load();
+      return;
+    }
+    if (btn.hasAttribute("data-toggle")){
+      const active = btn.textContent.includes("停用");
+      const body = await apiFull("/api/tenant/" + encodeURIComponent(tid) + "/status", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: active ? "suspended" : "active" })
+      });
+      if (body.message !== "success") throw new Error(body.message || "操作失败");
+      load();
+    }
+  }catch(e){
+    PP.showErr(e.message);
+  }
+});
+
+document.getElementById("btn-refresh").addEventListener("click", load);
+PP.boot(load);
+</script>
+</body>
+</html>

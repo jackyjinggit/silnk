@@ -1,0 +1,241 @@
+<script setup>
+import {computed, onMounted, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import axios from 'axios'
+import {ElMessage} from 'element-plus'
+
+const router = useRouter()
+const mode = ref('password')
+const phone = ref('')
+const password = ref('')
+const code = ref('')
+const sending = ref(false)
+const submitting = ref(false)
+const countdown = ref(0)
+const demoCode = ref('')
+const demoNote = ref('')
+let timer = null
+
+const base = () => window.config.baseURL
+const phoneOk = computed(() => /^1[3-9]\d{9}$/.test(phone.value.trim()))
+
+const startCountdown = (seconds) => {
+  countdown.value = seconds
+  if (timer) clearInterval(timer)
+  timer = setInterval(() => {
+    countdown.value -= 1
+    if (countdown.value <= 0) clearInterval(timer)
+  }, 1000)
+}
+
+const sendCode = async () => {
+  if (!phoneOk.value) { ElMessage.warning('请输入正确的 11 位手机号'); return }
+  if (sending.value || countdown.value > 0) return
+  sending.value = true
+  try {
+    const res = await axios.post(base() + '/api/auth/send-code', {phone: phone.value.trim()})
+    const msg = res.data.message
+    if (msg !== 'success') { ElMessage.error(msg || '发送失败'); return }
+    const data = res.data.data || {}
+    if (data.demo && data.demo_code) {
+      demoCode.value = data.demo_code
+      demoNote.value = data.note || '演示模式：验证码直接显示'
+      ElMessage.success('演示验证码已生成')
+    } else {
+      demoCode.value = ''
+      demoNote.value = ''
+      ElMessage.success('验证码已发送')
+    }
+    startCountdown(data.interval || 60)
+  } catch (e) {
+    ElMessage.error('发送失败，请稍后再试')
+  } finally {
+    sending.value = false
+  }
+}
+
+const saveLogin = (data, fallback) => {
+  window.localStorage.setItem('token', data.token)
+  window.localStorage.setItem('pp_user', JSON.stringify(data.user || {}))
+  ElMessage.success(fallback)
+  if (data.user && data.user.has_password === false) {
+    ElMessage.info('该账号还没有登录密码，可到注册页用验证码补设')
+  }
+  router.replace('/')
+}
+
+const submitPassword = async () => {
+  if (!phoneOk.value) { ElMessage.warning('请输入正确的 11 位手机号'); return }
+  if (!password.value) { ElMessage.warning('请输入密码'); return }
+  if (submitting.value) return
+  submitting.value = true
+  try {
+    const res = await axios.post(base() + '/api/auth/login', {
+      phone: phone.value.trim(),
+      password: password.value,
+    })
+    const msg = res.data.message
+    if (msg !== 'success') { ElMessage.error(msg || '登录失败'); return }
+    saveLogin(res.data.data || {}, '登录成功')
+  } catch (e) {
+    ElMessage.error('登录失败，请稍后再试')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const submitCode = async () => {
+  if (!phoneOk.value) { ElMessage.warning('请输入正确的 11 位手机号'); return }
+  if (!code.value.trim()) { ElMessage.warning('请输入验证码'); return }
+  if (submitting.value) return
+  submitting.value = true
+  try {
+    const res = await axios.post(base() + '/api/auth/verify', {
+      phone: phone.value.trim(),
+      code: code.value.trim(),
+    })
+    const msg = res.data.message
+    if (msg !== 'success') { ElMessage.error(msg || '登录失败'); return }
+    saveLogin(res.data.data || {}, '登录成功')
+  } catch (e) {
+    ElMessage.error('登录失败，请稍后再试')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const pending = (name) => ElMessage.info(name + '登录尚未接入')
+
+onMounted(async () => {
+  const token = window.localStorage.getItem('token')
+  if (!token) return
+  try {
+    await axios.get(base() + '/api/auth/me', {headers: {Authorization: 'Bearer ' + token}})
+    router.replace('/')
+  } catch (e) {
+    window.localStorage.removeItem('token')
+  }
+})
+</script>
+
+<template>
+  <div class="lg">
+    <div class="lgcard">
+      <div class="lghead">
+        <span class="mark">印</span>
+        <div>
+          <div class="bt">思印客</div>
+          <div class="bs">Silnk · 登录</div>
+        </div>
+      </div>
+
+      <div class="lgbody">
+        <div class="tabs">
+          <button type="button" :class="['tab', {on: mode === 'password'}]"
+                  @click="mode = 'password'">密码登录</button>
+          <button type="button" :class="['tab', {on: mode === 'code'}]"
+                  @click="mode = 'code'">验证码登录</button>
+        </div>
+
+        <label class="fld">
+          <span>手机号</span>
+          <input v-model="phone" type="tel" maxlength="11" placeholder="请输入 11 位手机号"
+                 autocomplete="tel">
+        </label>
+
+        <template v-if="mode === 'password'">
+          <label class="fld">
+            <span>密码</span>
+            <input v-model="password" type="password" maxlength="64" placeholder="请输入登录密码"
+                   autocomplete="current-password" @keyup.enter="submitPassword">
+          </label>
+          <button type="button" class="submit" :disabled="submitting" @click="submitPassword">
+            {{ submitting ? '登录中…' : '登录' }}
+          </button>
+        </template>
+
+        <template v-else>
+          <label class="fld">
+            <span>验证码</span>
+            <div class="coderow">
+              <input v-model="code" type="text" maxlength="6" placeholder="6 位验证码"
+                     inputmode="numeric" autocomplete="one-time-code" @keyup.enter="submitCode">
+              <button type="button" class="sendbtn"
+                      :disabled="sending || countdown > 0 || !phoneOk"
+                      @click="sendCode">
+                {{ countdown > 0 ? countdown + 's' : (sending ? '发送中…' : '获取验证码') }}
+              </button>
+            </div>
+          </label>
+          <div class="demo" v-if="demoCode">
+            <b>演示验证码 {{ demoCode }}</b>
+            <span>{{ demoNote }}</span>
+          </div>
+          <button type="button" class="submit" :disabled="submitting" @click="submitCode">
+            {{ submitting ? '登录中…' : '验证码登录' }}
+          </button>
+        </template>
+
+        <div class="switch">
+          还没有账号？
+          <button type="button" class="linkbtn" @click="router.push('/register')">立即注册</button>
+        </div>
+
+        <div class="tip">
+          登录后订单按账号保存，换设备也能查看。验证码登录仅限已注册账号。
+        </div>
+
+        <div class="third">
+          <button type="button" class="thirdbtn" disabled @click="pending('微信')">微信登录（待接入）</button>
+          <button type="button" class="thirdbtn" disabled @click="pending('支付宝')">支付宝登录（待接入）</button>
+        </div>
+
+        <div class="notice">
+          请勿上传打印涉黄、涉政、涉密、侵权等不合规的打印内容，一经查实，将同步公安并做永久封号处理！
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.lg{min-height:100vh;background:#f6f8fb;display:flex;align-items:center;justify-content:center;padding:24px}
+.lgcard{width:100%;max-width:420px;background:#fff;border:1px solid var(--line,#e5e8ee);
+  border-radius:14px;box-shadow:0 10px 30px rgba(20,40,80,.08);overflow:hidden}
+.lghead{display:flex;align-items:center;gap:12px;padding:20px 20px 16px;border-bottom:1px solid var(--line,#e5e8ee)}
+.lghead .mark{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+  background:var(--blue,#1f6feb);color:#fff;font-weight:700;font-size:17px}
+.lghead .bt{font-size:17px;font-weight:700;color:#111827}
+.lghead .bs{font-size:11.5px;color:#8a94a6;margin-top:2px}
+.lgbody{padding:18px 20px 20px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;background:#f3f6fa;border-radius:10px;padding:4px}
+.tab{flex:1;padding:9px;border:0;border-radius:8px;background:transparent;color:#5b6577;
+  font:inherit;font-size:13.5px;cursor:pointer}
+.tab.on{background:#fff;color:var(--blue,#1f6feb);font-weight:600;
+  box-shadow:0 1px 4px rgba(20,40,80,.08)}
+.fld{display:block;margin-bottom:14px}
+.fld > span{display:block;font-size:12.5px;color:#5b6577;margin-bottom:6px}
+.fld input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #dfe3ea;
+  border-radius:9px;font:inherit;font-size:14.5px;color:#111827;background:#fff;outline:none}
+.fld input:focus{border-color:var(--blue,#1f6feb);box-shadow:0 0 0 3px rgba(31,111,235,.12)}
+.coderow{display:flex;gap:8px}
+.coderow input{flex:1}
+.sendbtn{flex:0 0 108px;border:1px solid var(--blue,#1f6feb);background:#fff;color:var(--blue,#1f6feb);
+  border-radius:9px;font:inherit;font-size:13px;cursor:pointer}
+.sendbtn:disabled{opacity:.5;cursor:not-allowed}
+.submit{width:100%;margin-top:4px;padding:12px;border:0;border-radius:10px;
+  background:var(--blue,#1f6feb);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.submit:disabled{opacity:.6;cursor:not-allowed}
+.switch{margin-top:14px;text-align:center;font-size:13px;color:#8a94a6}
+.linkbtn{border:0;background:none;color:var(--blue,#1f6feb);font:inherit;font-size:13px;
+  cursor:pointer;padding:0 2px}
+.tip{margin-top:12px;font-size:12.5px;color:#8a94a6;line-height:1.6}
+.demo{margin:-6px 0 14px;padding:10px 12px;border-radius:9px;background:#fffbeb;
+  border:1px solid #fde68a;color:#92400e;font-size:13px;line-height:1.6}
+.demo b{display:block;font-weight:700;letter-spacing:.08em}
+.third{display:flex;gap:10px;margin-top:16px}
+.thirdbtn{flex:1;padding:10px;border:1px solid #e5e8ee;border-radius:9px;background:#fafbfc;
+  color:#a3abb8;font:inherit;font-size:12.5px;cursor:not-allowed}
+.notice{margin-top:16px;padding:10px 12px;border-radius:9px;background:#fff5f5;
+  border:1px solid #ffd7d7;border-left:4px solid #e5484d;color:#a12b2f;font-size:12.5px;line-height:1.65}
+</style>

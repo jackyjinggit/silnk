@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 取件屏</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+</head>
+<body data-page="display">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem active" data-page="display" href="display.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        取件屏<span class="cnt" id="nav-disp">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>取件屏</h1>
+        <div class="crumb">屏幕实时态、队列、纸量与绑定打印机</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>取件终端</h3>
+          <span class="c"><span id="disp-count">0 台</span></span></div>
+        <div id="terminals"><div class="empty">等待数据…</div></div>
+        <div class="fnote">屏幕态取自 <code>/api/display/{device_id}/state</code>，与 T5 屏幕上显示的是同一份数据。
+          「可打印 / 忙 / 取件码」三态由该设备的未完成订单与最近完成订单决定；同一设备 10 秒内最多取 20 次，超出返回 429。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js"></script>
+<script>
+const STATE_TEXT = { idle: "可打印", busy: "忙", pickup: "取件中" };
+const STATE_CLASS = { idle: "on", busy: "warn", pickup: "crit" };
+
+async function rawGet(path){
+  const res = await fetch(path, { headers: { Authorization: "Bearer " + PP.getKey() } });
+  if (res.status === 401) throw new Error("密钥无效（401）");
+  if (res.status === 429) return { limited: true };
+  if (!res.ok) throw new Error(path + " 返回 " + res.status);
+  return res.json();
+}
+
+function printerNames(device){
+  const list = device.printers || [];
+  const names = list.map(p => p.name).filter(Boolean);
+  return names.length ? names.join(" / ") : (device.model || "—");
+}
+
+function terminalCard(device, state){
+  const { age, stale, online } = PP.onlineInfo(device);
+  const st = state && !state.limited ? state : null;
+  const stateKey = st ? st.state : null;
+  const paper = st && st.paper ? st.paper : null;
+  const paperText = paper && paper.sheets !== null && paper.sheets !== undefined
+    ? paper.sheets + " 张" : "—";
+  const queueLen = st ? st.queue_len : (device.queue_depth ?? 0);
+  const pickup = st && st.pickup ? st.pickup.code : "";
+  const price = st && st.price ? st.price.bw : null;
+
+  return `<div class="dev">
+    <div class="top">
+      <span class="id">${PP.esc(device.device_id)}</span>
+      <span class="nm">${PP.esc(device.name || "未命名点位")}</span>
+      <span class="mdl">${PP.esc(device.model || "型号未上报")}</span>
+      <span class="pill ${online ? "on" : "off"}">${online ? "在线" : (stale ? "心跳超时" : "离线")}</span>
+      ${stateKey ? `<span class="pill ${STATE_CLASS[stateKey] || "warn"}">${STATE_TEXT[stateKey] || stateKey}${pickup ? " " + PP.esc(pickup) : ""}</span>`
+        : '<span class="pill warn">屏幕态读取失败</span>'}
+      <span class="age ${stale ? "stale" : ""}">${age === null ? "无心跳" : PP.fmtAge(age)}</span>
+      <a class="btn sm" href="device.html?id=${encodeURIComponent(device.device_id)}" style="margin-left:10px">详情</a>
+    </div>
+    <div class="row">
+      <div class="field"><div class="fk">屏幕态</div>
+        <div class="fv">${stateKey ? (STATE_TEXT[stateKey] || stateKey) : "—"}
+        ${pickup ? `<small> 取件码 ${PP.esc(pickup)}</small>` : ""}</div></div>
+      <div class="field"><div class="fk">排队</div>
+        <div class="fv">${PP.esc(queueLen ?? 0)}<small> 单</small></div></div>
+      <div class="field"><div class="fk">纸量</div>
+        <div class="fv">${PP.esc(paperText)}</div></div>
+      <div class="field"><div class="fk">单价</div>
+        <div class="fv">${price === null || price === undefined ? "—" : Number(price).toFixed(2)}<small> 元/张</small></div></div>
+    </div>
+    <div class="row">
+      <div class="field"><div class="fk">绑定打印机</div>
+        <div class="fv">${PP.esc(printerNames(device))}</div></div>
+      <div class="field"><div class="fk">最后心跳</div>
+        <div class="fv">${PP.esc(device.last_heartbeat || "—")}</div></div>
+    </div>
+  </div>`;
+}
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const list = await PP.api("/api/device/list");
+    const devices = list.devices || [];
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    PP.setCounts({ devices: devices.length });
+    document.getElementById("nav-disp").textContent = devices.length;
+    document.getElementById("disp-count").textContent = devices.length + " 台";
+
+    if (!devices.length){
+      document.getElementById("terminals").innerHTML =
+        '<div class="empty">还没有设备 —— 先在「设备」页接入一台打印机</div>';
+      return;
+    }
+
+    const states = await Promise.all(devices.map(async d => {
+      try{
+        return await rawGet("/api/display/" + encodeURIComponent(d.device_id) + "/state");
+      }catch(e){
+        return null;
+      }
+    }));
+    document.getElementById("terminals").innerHTML =
+      devices.map((d, i) => terminalCard(d, states[i])).join("");
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+PP.boot(load);
+</script>
+</body>
+</html>

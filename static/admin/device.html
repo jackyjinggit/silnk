@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 设备详情</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+<style>
+  .backlink{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);text-decoration:none;
+    font-size:12.5px;margin-bottom:10px}
+  .backlink:hover{color:var(--blue)}
+  .devhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .devhead h1{margin:0;font-family:var(--num);font-size:24px;letter-spacing:-.01em}
+  .devhead .sub{color:var(--ink-2);font-size:13px}
+  .devhead .sp{flex:1}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .k{font-size:11.5px;color:var(--ink-3);font-weight:600}
+  .stat .v{font-family:var(--num);font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-.02em}
+  .stat .v small{font-size:12px;font-weight:600;color:var(--ink-2);margin-left:2px}
+  .kv{display:grid;grid-template-columns:96px 1fr;gap:8px 12px;font-size:13px}
+  .kv .k{color:var(--ink-3)}
+  .kv .v{color:var(--ink);word-break:break-all}
+  .qrow{display:flex;align-items:center;gap:10px;padding:11px 20px;border-bottom:1px solid var(--line)}
+  .qrow:last-child{border-bottom:0}
+  .qrow .idx{width:22px;height:22px;border-radius:6px;background:var(--blue-50);color:var(--blue);
+    display:grid;place-items:center;font-size:11px;font-weight:700;font-family:var(--num);flex:0 0 22px}
+  .qrow .fn{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .qrow .meta{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+  .qrow .sp{flex:1}
+  .arow{display:flex;gap:10px;align-items:flex-start;padding:11px 20px;border-bottom:1px solid var(--line)}
+  .arow:last-child{border-bottom:0}
+  .arule{flex:0 0 auto;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+  .arule.crit{background:var(--crit-bg);color:var(--crit)}
+  .arule.warn{background:var(--warn-bg);color:var(--warn)}
+  .am{min-width:0}
+  .amt{font-size:12.5px;font-weight:600}
+  .amd{font-size:11.5px;color:var(--ink-2);margin-top:2px;line-height:1.5}
+  .adt{font-size:11px;color:var(--ink-3);margin-top:3px}
+</style>
+</head>
+<body data-page="devices">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem active" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="display" href="display.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        取件屏<span class="cnt" id="nav-disp">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>设备详情</h1>
+        <div class="crumb">运行状态、实时队列与最近告警</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <a class="backlink" href="devices.html">← 返回设备列表</a>
+      <div class="devhead" style="margin-bottom:18px">
+        <h1 id="d-id">—</h1>
+        <span class="sub" id="d-name"></span>
+        <span class="pill off" id="d-status">—</span>
+        <span class="sp"></span>
+        <span class="sub" id="d-heartbeat"></span>
+      </div>
+
+      <div class="card reveal" style="margin-bottom:20px">
+        <div class="ch"><h3>运行状态</h3><span class="c" id="d-updated">—</span></div>
+        <div class="statgrid" id="d-stats">
+          <div class="stat"><div class="k">纸张余量</div><div class="v" id="s-paper">—</div>
+            <div class="bar" style="margin-top:10px"><span id="s-paper-bar" style="width:0%"></span></div></div>
+          <div class="stat"><div class="k">累计用纸</div><div class="v" id="s-used">—</div></div>
+          <div class="stat"><div class="k">当前队列</div><div class="v" id="s-queue">—</div></div>
+          <div class="stat"><div class="k">注册时长</div><div class="v" id="s-uptime">—</div></div>
+        </div>
+      </div>
+
+      <div class="card reveal" style="margin-bottom:20px">
+        <div class="ch"><h3>出纸确认</h3><span class="c" id="e-count">—</span></div>
+        <div id="e-body" style="padding:14px 20px"><div class="empty">加载中…</div></div>
+        <div class="fnote">由出纸口摄像头（X5）在识别到真实出纸时抓拍，仅在有活动订单时上报。</div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="card reveal" style="margin-bottom:20px">
+            <div class="ch"><h3>实时队列</h3><span class="c" id="q-count">—</span></div>
+            <div id="q-body"><div class="empty">加载中…</div></div>
+          </div>
+
+          <div class="card reveal">
+            <div class="ch"><h3>最近告警</h3><span class="c" id="a-count">—</span></div>
+            <div id="a-body"><div class="empty">加载中…</div></div>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ch"><h3>设备信息</h3><span class="c">只读</span></div>
+          <div style="padding:16px 20px">
+            <div class="kv">
+              <div class="k">设备 ID</div><div class="v" id="i-id">—</div>
+              <div class="k">名称</div><div class="v" id="i-name">—</div>
+              <div class="k">型号</div><div class="v" id="i-model">—</div>
+              <div class="k">驱动</div><div class="v" id="i-driver">—</div>
+              <div class="k">连接方式</div><div class="v" id="i-conn">—</div>
+              <div class="k">纸盒容量</div><div class="v" id="i-cap">—</div>
+              <div class="k">纸张状态</div><div class="v" id="i-paper">—</div>
+              <div class="k">UPS</div><div class="v" id="i-ups">—</div>
+              <div class="k">门磁</div><div class="v" id="i-door">—</div>
+              <div class="k">取件序号</div><div class="v" id="i-pickup">—</div>
+              <div class="k">注册时间</div><div class="v" id="i-created">—</div>
+              <div class="k">最后心跳</div><div class="v" id="i-heartbeat">—</div>
+            </div>
+            <div class="fnote">未上报的传感器字段显示「未上报」，不参与告警判定。纸量与队列由后台实时计算。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card reveal" style="margin-top:20px">
+        <div class="ch"><h3>能力与位置</h3><span class="c">用于智能选机</span></div>
+        <div style="padding:16px 20px">
+          <div class="fgrid">
+            <div class="fg"><label>展示名</label><input id="c-name" placeholder="三楼阅览室 · HP"></div>
+            <div class="fg"><label>门店名称</label><input id="c-store" placeholder="图书馆三楼"></div>
+            <div class="fg"><label>门店地址</label><input id="c-address" placeholder="XX 大学图书馆 3F"></div>
+            <div class="fg"><label>营业时间</label><input id="c-hours" placeholder="周一至周日 08:00-22:00"></div>
+            <div class="fg"><label>打印速度（页/分钟）</label><input id="c-speed" type="number" min="0.1" step="0.1" placeholder="8"></div>
+            <div class="fg"><label>纬度</label><input id="c-lat" type="number" step="0.000001" placeholder="30.123456"></div>
+            <div class="fg"><label>经度</label><input id="c-lng" type="number" step="0.000001" placeholder="120.123456"></div>
+            <div class="fg"><label>能力</label>
+              <div style="display:flex;gap:16px;align-items:center;height:38px">
+                <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-color"> 支持彩色</label>
+                <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="c-duplex"> 自动双面</label>
+              </div>
+            </div>
+          </div>
+          <div class="factions">
+            <button class="btn primary" id="c-save">保存能力与位置</button>
+            <span class="fmsg" id="c-msg"></span>
+          </div>
+          <div class="fnote">支持彩色/自动双面会参与智能选机评分；经纬度用于距离推荐（浏览器定位需要 HTTPS）。留空的数值不会覆盖原值。</div>
+        </div>
+      </div>
+
+      <div class="card reveal" style="margin-top:20px">
+        <div class="ch"><h3>实时日志</h3>
+          <span class="c"><span id="log-time">—</span>
+            <button class="btn sm" id="btn-log-refresh" style="margin-left:10px">刷新</button></span></div>
+        <pre id="log-body" style="margin:0;padding:14px 20px;max-height:340px;overflow:auto;background:#0F172A;color:#CBD5E1;font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-all">加载中…</pre>
+        <div class="fnote" id="log-source">日志来自打印机端 client 上报；服务器本身不运行 CUPS，因此这里不是 CUPS 服务日志。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc, fmtAge, ageOf, onlineInfo, PAPER_LABEL } = PP;
+const DEVICE_ID = new URLSearchParams(location.search).get("id") || "";
+
+function setText(id, v){ const el = document.getElementById(id); if (el) el.textContent = v; }
+
+function uptime(created){
+  if (!created) return "—";
+  const t = Date.parse(String(created).replace(" ", "T"));
+  if (isNaN(t)) return "—";
+  const sec = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if (sec < 3600) return Math.max(1, Math.round(sec / 60)) + " 分钟";
+  if (sec < 86400) return Math.round(sec / 3600) + " 小时";
+  return Math.floor(sec / 86400) + " 天 " + Math.round(sec % 86400 / 3600) + " 小时";
+}
+
+/* 能力与位置表单：数据没变不覆盖用户正在输入的内容 */
+let configSnapshot = {color: null, duplex: null};
+
+function fillConfig(device){
+  const ae = document.activeElement;
+  if (ae && ae.id && ae.id.startsWith("c-")) return;
+  document.getElementById("c-name").value = device.name || "";
+  document.getElementById("c-store").value = device.store_name || "";
+  document.getElementById("c-address").value = device.address || "";
+  document.getElementById("c-hours").value = device.business_hours || "";
+  document.getElementById("c-speed").value =
+    (device.speed_ppm === null || device.speed_ppm === undefined) ? "" : device.speed_ppm;
+  document.getElementById("c-lat").value =
+    (device.lat === null || device.lat === undefined) ? "" : device.lat;
+  document.getElementById("c-lng").value =
+    (device.lng === null || device.lng === undefined) ? "" : device.lng;
+  document.getElementById("c-color").checked = device.supports_color === true;
+  document.getElementById("c-duplex").checked = device.supports_duplex === true;
+  configSnapshot = {color: device.supports_color, duplex: device.supports_duplex};
+}
+
+document.getElementById("c-save").onclick = async () => {
+  const msg = document.getElementById("c-msg");
+  const body = {};
+  const name = document.getElementById("c-name").value.trim();
+  const store = document.getElementById("c-store").value.trim();
+  const address = document.getElementById("c-address").value.trim();
+  const hours = document.getElementById("c-hours").value.trim();
+  const speed = document.getElementById("c-speed").value.trim();
+  const lat = document.getElementById("c-lat").value.trim();
+  const lng = document.getElementById("c-lng").value.trim();
+  if (name) body.name = name;
+  if (store) body.store_name = store;
+  if (address) body.address = address;
+  if (hours) body.business_hours = hours;
+  if (speed !== "") body.speed_ppm = Number(speed);
+  if (lat !== "") body.lat = Number(lat);
+  if (lng !== "") body.lng = Number(lng);
+
+  // 能力只在用户改动过时提交，避免把「未设置」误写成「不支持」
+  const color = document.getElementById("c-color").checked;
+  const duplex = document.getElementById("c-duplex").checked;
+  if (color !== !!configSnapshot.color) body.supports_color = color;
+  if (duplex !== !!configSnapshot.duplex) body.supports_duplex = duplex;
+
+  if (!Object.keys(body).length){
+    msg.style.color = "var(--ink-2)";
+    msg.textContent = "没有需要保存的改动";
+    return;
+  }
+  msg.style.color = "var(--ink-2)";
+  msg.textContent = "保存中…";
+  try{
+    const r = await PP.postFull(
+      "/api/device/" + encodeURIComponent(DEVICE_ID) + "/config", body);
+    if (r.message !== "success") throw new Error(r.message || "保存失败");
+    msg.style.color = "var(--ok)";
+    msg.textContent = "已保存，智能选机会使用这些配置";
+    const ae = document.activeElement;
+    if (ae && ae.blur) ae.blur();
+    load();
+  }catch(e){
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：" + e.message;
+  }
+};
+
+function render(device, orders, alerts){
+  const info = onlineInfo(device);
+  const cap = Number(device.paper_capacity || 0);
+  const left = device.paper_left === null || device.paper_left === undefined
+    ? null : Number(device.paper_left);
+  const pct = cap && left !== null ? Math.max(0, Math.min(100, Math.round(left / cap * 100))) : 0;
+
+  setText("d-id", device.device_id);
+  setText("d-name", device.name || "");
+  const st = document.getElementById("d-status");
+  st.className = "pill " + (info.online ? "on" : "off");
+  st.textContent = info.online ? "在线" : "离线";
+  setText("d-heartbeat", info.age === null ? "无心跳记录" : "最后心跳 " + fmtAge(info.age));
+  setText("d-updated", "数据每 5 秒刷新");
+
+  setText("s-paper", cap ? left + " / " + cap : "—");
+  document.getElementById("s-paper-bar").style.width = pct + "%";
+  setText("s-used", String(device.pages_printed ?? 0) + " 张");
+  setText("s-queue", String(device.queue_depth ?? 0) + " 份");
+  setText("s-uptime", uptime(device.created_at));
+
+  setText("i-id", device.device_id || "—");
+  setText("i-name", device.name || "—");
+  setText("i-model", device.model || "—");
+  setText("i-driver", device.driver || "—");
+  setText("i-conn", device.conn || "—");
+  setText("i-cap", cap ? cap + " 张" : "—");
+  setText("i-paper", PAPER_LABEL[device.paper_state] || "未上报");
+  setText("i-ups", device.ups_online === null || device.ups_online === undefined
+    ? "未上报" : (device.ups_online ? "市电正常" : "UPS 供电中"));
+  setText("i-door", device.door_open === null || device.door_open === undefined
+    ? "未上报" : (device.door_open ? "已开启" : "关闭"));
+  setText("i-pickup", device.pickup_seq === null || device.pickup_seq === undefined
+    ? "未上报" : String(device.pickup_seq));
+  setText("i-created", device.created_at || "—");
+  setText("i-heartbeat", device.last_heartbeat || "—");
+  fillConfig(device);
+
+  const mine = orders.filter(o => (o.printer_id || "") === device.device_id);
+  const pending = mine.filter(o => o.status !== "completed")
+    .sort((a, b) => a.id - b.id);
+  setText("q-count", pending.length + " 份排队 · 已完成 " +
+    mine.filter(o => o.status === "completed").length + " 单");
+  const qbody = document.getElementById("q-body");
+  qbody.innerHTML = pending.length ? pending.map((o, i) => {
+    const s = o.print_range_start ?? 1, e = o.print_range_end ?? s;
+    return `<div class="qrow">
+      <span class="idx">${i + 1}</span>
+      <div style="min-width:0">
+        <div class="fn" title="${esc(o.filename)}">${esc(o.filename)}</div>
+        <div class="meta">${Math.max(e - s + 1, 0)} 页 · ${esc(o.print_copies ?? 1)} 份 ·
+          ${o.print_side === "one-sided" ? "单面" : "双面"} ·
+          ${o.print_color === "color" ? "彩色" : "黑白"} ·
+          ${esc(o.paper || "A4")} · ${esc(o.created_at || "")}</div>
+      </div>
+      <span class="sp"></span>
+      <span class="pill warn">待打印</span>
+    </div>`;
+  }).join("") : '<div class="empty">队列为空 —— 当前没有待打印订单</div>';
+
+  const mineAlerts = alerts.filter(a => a.device_id === device.device_id);
+  const open = mineAlerts.filter(a => !a.resolved_at).length;
+  setText("a-count", mineAlerts.length + " 条（未处理 " + open + "）");
+  const abody = document.getElementById("a-body");
+  abody.innerHTML = mineAlerts.length ? mineAlerts.slice(0, 8).map(a => {
+    const done = !!a.resolved_at;
+    const age = ageOf(a.triggered_at);
+    return `<div class="arow">
+      <span class="arule ${a.level === "critical" ? "crit" : "warn"}">${esc(a.rule)}</span>
+      <div class="am">
+        <div class="amt">${done ? "已处理" : "未处理"}
+          <span style="color:var(--ink-3);font-weight:400">· ${esc(a.triggered_at || "")}</span></div>
+        <div class="amd">${esc(a.message)}</div>
+      </div>
+    </div>`;
+  }).join("") : '<div class="empty">这台设备暂无告警</div>';
+}
+
+/* 实时日志：来自打印机端 client 每 10 秒推送一次，随页面 5 秒轮询一起刷新 */
+function renderLogs(data){
+  const pre = document.getElementById("log-body");
+  const lines = (data && data.lines) || [];
+  pre.textContent = lines.length
+    ? lines.join("\n")
+    : "暂无日志 —— 打印机端 client 尚未推送（升级到最新 client 后每 10 秒推送一次）";
+  const time = document.getElementById("log-time");
+  if (time) time.textContent = data && data.updated_at ? "更新于 " + data.updated_at : "—";
+  if (data && data.source) document.getElementById("log-source").textContent = data.source;
+  pre.scrollTop = pre.scrollHeight;
+}
+
+async function loadLogs(){
+  try{
+    renderLogs(await PP.api("/api/device/" + encodeURIComponent(DEVICE_ID) + "/logs?limit=200"));
+  }catch(e){
+    document.getElementById("log-body").textContent = "日志读取失败：" + e.message;
+  }
+}
+document.getElementById("btn-log-refresh").onclick = loadLogs;
+
+function fmtTime(ts){
+  if (!ts) return "—";
+  const d = new Date(ts * 1000);
+  const p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " "
+    + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+}
+
+async function photoURL(eventId){
+  const res = await fetch("/api/edge/" + encodeURIComponent(DEVICE_ID) + "/eject/"
+    + encodeURIComponent(eventId) + "/photo",
+    { headers: { Authorization: "Bearer " + PP.getKey() } });
+  if (!res.ok) return null;
+  return URL.createObjectURL(await res.blob());
+}
+
+async function loadEjects(){
+  const body = document.getElementById("e-body");
+  const cnt = document.getElementById("e-count");
+  try{
+    const data = await PP.api("/api/edge/" + encodeURIComponent(DEVICE_ID) + "/eject?limit=4");
+    const events = (data && data.events) || [];
+    cnt.textContent = events.length ? "最近 " + events.length + " 次" : "—";
+    if (!events.length){
+      body.innerHTML = '<div class="empty">暂无出纸记录（有订单打印后自动出现）</div>';
+      return;
+    }
+    body.innerHTML = "";
+    for (const ev of events){
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #EEF2F7";
+      const info = document.createElement("div");
+      info.style.cssText = "flex:1;min-width:0";
+      const conf = ev.confidence === null || ev.confidence === undefined
+        ? "—" : Math.round(ev.confidence * 100) + "%";
+      info.innerHTML = '<div style="font-weight:600;font-size:13px">'
+        + (ev.source === "vision" ? "视觉识别出纸" : "手动确认出纸") + '</div>'
+        + '<div class="fnote" style="margin:4px 0 0">' + fmtTime(ev.ts)
+        + ' · 置信度 ' + conf + '</div>';
+      row.appendChild(info);
+      if (ev.has_photo){
+        const img = document.createElement("img");
+        img.alt = "出纸现场图";
+        img.style.cssText = "width:180px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC";
+        row.appendChild(img);
+        photoURL(ev.event_id).then(url => { if (url) img.src = url; });
+      }else{
+        const none = document.createElement("div");
+        none.className = "fnote";
+        none.textContent = "无现场图";
+        row.appendChild(none);
+      }
+      body.appendChild(row);
+    }
+  }catch(e){
+    body.innerHTML = '<div class="empty">出纸记录读取失败：' + e.message + '</div>';
+  }
+}
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  if (!DEVICE_ID){
+    PP.setLive(false, "缺少设备 ID");
+    PP.showErr("地址缺少 ?id=设备ID，请从设备列表点「详情」进入");
+    return;
+  }
+  try{
+    const [dv, od, al] = await Promise.all([
+      PP.api("/api/device/" + encodeURIComponent(DEVICE_ID)),
+      PP.api("/api/order/list"),
+      PP.api("/api/alert/list"),
+    ]);
+    const device = dv.device;
+    if (!device){
+      PP.setLive(false, "设备不存在");
+      PP.showErr("设备 " + DEVICE_ID + " 不存在或已删除");
+      return;
+    }
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    render(device, od.orders || [], al.alerts || []);
+    PP.setCounts({
+      devices: 1,
+      orders: (od.orders || []).filter(o => o.status !== "completed").length,
+      alerts: (al.alerts || []).filter(a => !a.resolved_at).length,
+    });
+    loadLogs();
+    loadEjects();
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+PP.boot(load);
+</script>
+</body>
+</html>

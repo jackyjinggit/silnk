@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 统计报表</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+<style>
+  .filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+  .filters label{display:block;font-size:12px;color:var(--ink-3);margin-bottom:5px}
+  .filters input,.filters select{height:36px;border:1px solid var(--line);border-radius:8px;
+    padding:0 10px;font-size:13px;background:#fff;color:var(--ink);min-width:130px}
+  .filters .grow{flex:1;min-width:180px}
+  .stmt{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:16px 0 18px}
+  .stmt .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stmt .k{font-size:12px;color:var(--ink-3)}
+  .stmt .v{font-size:26px;font-weight:700;color:var(--ink);margin-top:4px;font-family:var(--num)}
+  .stmt .v small{font-size:12px;font-weight:400;color:var(--ink-3);margin-left:3px}
+  .stmt .box.hi{background:#f5f9ff;border-color:#cfe0ff}
+  .stmt .box.hi .v{color:var(--blue)}
+  .trend{display:flex;align-items:flex-end;gap:8px;height:150px;padding:10px 4px 0;overflow-x:auto}
+  .trend .bar{flex:1;min-width:22px;display:flex;flex-direction:column;justify-content:flex-end;
+    align-items:center;gap:4px;height:100%}
+  .trend .bar i{display:block;width:100%;background:var(--blue);border-radius:4px 4px 0 0;min-height:2px}
+  .trend .bar span{font-size:10px;color:var(--ink-3);white-space:nowrap}
+  .trend .bar b{font-size:10px;color:var(--ink-2);font-weight:600}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  table.rt{width:100%;border-collapse:collapse}
+  table.rt th,table.rt td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:12.5px;text-align:right}
+  table.rt th:first-child,table.rt td:first-child{text-align:left}
+  table.rt th{font-size:11.5px;color:var(--ink-3);font-weight:600;background:#fbfcfe}
+  table.rt tr:last-child td{border-bottom:0}
+  .empty{padding:26px;text-align:center;color:var(--ink-3);font-size:12.5px}
+  @media(max-width:1200px){.stmt{grid-template-columns:repeat(3,1fr)}.cols{grid-template-columns:1fr}}
+  @media(max-width:760px){.stmt{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body data-page="reports">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem active" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>统计报表</h1>
+        <div class="crumb">按日期、租户、设备统计订单 / 页数 / 纸张 / 营收，并导出 CSV</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card">
+        <div class="ch"><h3>筛选</h3><span class="c">默认最近 7 天</span></div>
+        <div style="padding:16px 18px">
+          <div class="filters">
+            <div><label>开始日期</label><input type="date" id="f-start"></div>
+            <div><label>结束日期</label><input type="date" id="f-end"></div>
+            <div><label>租户</label><select id="f-tenant"><option value="">全部租户</option></select></div>
+            <div class="grow"><label>设备</label><select id="f-device" style="width:100%"><option value="">全部设备</option></select></div>
+            <button class="btn primary" id="btn-query">查询</button>
+            <button class="btn" id="btn-reset">重置</button>
+            <button class="btn" id="btn-export-daily">导出日报 CSV</button>
+            <button class="btn" id="btn-export-orders">导出订单明细 CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stmt">
+        <div class="box"><div class="k">订单总数</div><div class="v" id="s-orders">0</div></div>
+        <div class="box"><div class="k">完成率</div><div class="v" id="s-rate">0<small>%</small></div></div>
+        <div class="box"><div class="k">打印页数</div><div class="v" id="s-pages">0</div></div>
+        <div class="box"><div class="k">用纸张数</div><div class="v" id="s-sheets">0</div></div>
+        <div class="box hi"><div class="k">实收营收</div><div class="v" id="s-revenue">0<small>元</small></div></div>
+        <div class="box"><div class="k">平均客单价</div><div class="v" id="s-avg">0<small>元</small></div></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>每日趋势</h3><span class="c" id="trend-note">—</span></div>
+        <div class="trend" id="trend"></div>
+        <div id="daily-table"></div>
+      </div>
+
+      <div class="cols">
+        <div class="card">
+          <div class="ch"><h3>按设备</h3><span class="c">按营收排序</span></div>
+          <div id="device-table"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>按租户</h3><span class="c">按营收排序</span></div>
+          <div id="tenant-table"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>输入商家密钥查看报表；运维密钥没有金额权限。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+const $ = id => document.getElementById(id);
+let loadedOptions = false;
+
+function isoDay(offset) {
+  // 用本地时区拼日期：toISOString() 是 UTC，早上 8 点前会退回前一天
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+function initDates() {
+  if ($("f-start").value || $("f-end").value) return;
+  $("f-start").value = isoDay(-6);
+  $("f-end").value = isoDay(0);
+}
+
+function queryString() {
+  const p = new URLSearchParams();
+  if ($("f-start").value) p.set("start", $("f-start").value);
+  if ($("f-end").value) p.set("end", $("f-end").value);
+  if ($("f-tenant").value) p.set("tenant_id", $("f-tenant").value);
+  if ($("f-device").value) p.set("device_id", $("f-device").value);
+  return p.toString();
+}
+
+async function loadOptions() {
+  if (loadedOptions) return;
+  try {
+    const [tenants, devices] = await Promise.all([
+      PP.api("/api/tenant/list").catch(() => ({ tenants: [] })),
+      PP.api("/api/device/list").catch(() => ({ devices: [] })),
+    ]);
+    // 运营密钥看不到租户列表，保持空即可
+    ($("f-tenant")).innerHTML = '<option value="">全部租户</option>' +
+      ((tenants.tenants || []).map(t =>
+        `<option value="${esc(t.tenant_id)}">${esc(t.name || t.tenant_id)}</option>`).join(""));
+    ($("f-device")).innerHTML = '<option value="">全部设备</option>' +
+      ((devices.devices || []).map(d =>
+        `<option value="${esc(d.device_id)}">${esc(d.name || d.device_id)}</option>`).join(""));
+    loadedOptions = true;
+  } catch (e) { /* 选项拉取失败不阻塞报表 */ }
+}
+
+function renderSummary(s) {
+  $("s-orders").textContent = s.orders_total;
+  $("s-rate").innerHTML = s.completion_rate + "<small>%</small>";
+  $("s-pages").textContent = s.pages;
+  $("s-sheets").textContent = s.sheets;
+  $("s-revenue").innerHTML = Number(s.revenue).toFixed(2) + "<small>元</small>";
+  $("s-avg").innerHTML = Number(s.avg_price).toFixed(2) + "<small>元</small>";
+}
+
+function renderTrend(rows) {
+  const box = $("trend");
+  if (!rows.length) {
+    box.innerHTML = '<div class="empty">所选范围没有订单</div>';
+    $("trend-note").textContent = "—";
+    return;
+  }
+  const max = Math.max(...rows.map(r => r.pages), 1);
+  box.innerHTML = rows.map(r => {
+    const h = Math.max(2, Math.round(r.pages / max * 100));
+    return `<div class="bar" title="${esc(r.date)} · ${r.pages} 页 · ${r.revenue} 元">
+      <b>${r.pages}</b><i style="height:${h}%"></i><span>${esc(r.date.slice(5))}</span></div>`;
+  }).join("");
+  $("trend-note").textContent = `共 ${rows.length} 天 · 峰值 ${max} 页`;
+}
+
+function renderDaily(rows) {
+  const box = $("daily-table");
+  if (!rows.length) { box.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+  box.innerHTML = `<table class="rt"><thead><tr>
+    <th>日期</th><th>订单数</th><th>完成数</th><th>打印页数</th><th>营收(元)</th>
+  </tr></thead><tbody>${rows.map(r => `<tr>
+    <td>${esc(r.date)}</td><td>${r.orders}</td><td>${r.completed}</td>
+    <td>${r.pages}</td><td>${Number(r.revenue).toFixed(2)}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function renderBuckets(id, rows, key) {
+  const box = $(id);
+  if (!rows.length) { box.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+  box.innerHTML = `<table class="rt"><thead><tr>
+    <th>${key === "device" ? "设备" : "租户"}</th><th>订单数</th><th>页数</th><th>营收(元)</th>
+  </tr></thead><tbody>${rows.map(r => `<tr>
+    <td>${esc(r.name || r[key + "_id"])}</td><td>${r.orders}</td>
+    <td>${r.pages}</td><td>${Number(r.revenue).toFixed(2)}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+async function load() {
+  initDates();
+  if (!PP.getKey()) {
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：请点右上角「密钥」输入 SECRET_KEY");
+    return;
+  }
+  try {
+    await loadOptions();
+    // 后端业务错误走 ReturnResult(200, message, {})，这里必须检查 message，
+    // 否则页面会把 {} 渲染成 undefined / NaN
+    const res = await fetch("/api/reports/summary?" + queryString(), {
+      headers: { Authorization: "Bearer " + PP.getKey() },
+    });
+    if (res.status === 401) throw new Error("密钥无效（401）");
+    if (!res.ok) throw new Error("报表接口返回 " + res.status);
+    const body = await res.json();
+    if (body.message !== "success") throw new Error(body.message || "查询失败");
+    const data = body.data;
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    renderSummary(data.summary || {});
+    renderTrend(data.daily || []);
+    renderDaily(data.daily || []);
+    renderBuckets("device-table", data.by_device || [], "device");
+    renderBuckets("tenant-table", data.by_tenant || [], "tenant");
+  } catch (e) {
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+
+async function exportCsv(path, filename) {
+  if (!PP.getKey()) { alert("请先输入管理端密钥"); return; }
+  try {
+    const res = await fetch(path + "?" + queryString(), {
+      headers: { Authorization: "Bearer " + PP.getKey() },
+    });
+    if (!res.ok) throw new Error("导出失败：" + res.status);
+    const type = res.headers.get("content-type") || "";
+    if (!type.includes("text/csv")) {
+      // 后端业务错误会返回 JSON，不能当成 CSV 下载
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || "导出失败");
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+$("btn-query").onclick = () => load();
+$("btn-reset").onclick = () => {
+  $("f-start").value = isoDay(-6);
+  $("f-end").value = isoDay(0);
+  $("f-tenant").value = "";
+  $("f-device").value = "";
+  load();
+};
+$("btn-export-daily").onclick = () => exportCsv("/api/reports/daily.csv",
+  `silnk_daily_${$("f-start").value}_${$("f-end").value}.csv`);
+$("btn-export-orders").onclick = () => exportCsv("/api/reports/orders.csv",
+  `silnk_orders_${$("f-start").value}_${$("f-end").value}.csv`);
+
+PP.boot(load);
+</script>
+</body>
+</html>

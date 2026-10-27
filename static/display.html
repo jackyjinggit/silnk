@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 取件屏</title>
+<link rel="stylesheet" href="admin/assets/admin.css?v=3">
+<style>
+  /* 取件屏大屏页（降级档 L1）
+     用途：固件烧不进去时，用平板/笔记本全屏摆在打印机旁，替代 T5 屏。
+     设计约束来自《明日执行计划》第六节 L1 达标标准：
+       - 浏览器全屏打开
+       - 3 秒轮询
+       - 字号 >= 120px
+       - 取件码占屏幕一半
+       - 断网时置灰不清屏（保留最后一帧）
+     配色沿用项目主色（奶油底 + 珊瑚渐变），保证和真屏观感一致。
+  */
+  :root{
+    --cream:#FFFDFB; --ink:#2A2320; --ink2:#7A6A62; --ink3:#A08C80;
+    --coral:#FF7043; --coral2:#FF8A65; --coral-soft:#FFEDE4;
+    --ok:#2E9E5B; --warn:#E8A33D; --crit:#D9483B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+    background:var(--cream);color:var(--ink);overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 100% 0%,rgba(255,138,101,.14),transparent 46%),
+      linear-gradient(180deg,#FFFDFB 0%,#FFF4EC 100%);
+  }
+
+  .bar{
+    position:relative;z-index:2;display:flex;align-items:center;gap:18px;
+    padding:22px 42px;border-bottom:2px solid var(--coral);flex:0 0 auto;
+  }
+  .brand{display:flex;align-items:center;gap:13px}
+  .mark{
+    width:52px;height:52px;border-radius:14px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--coral2),var(--coral));
+    display:grid;place-items:center;color:#fff;font-size:25px;font-weight:800;
+    box-shadow:0 5px 16px rgba(255,112,67,.28);
+  }
+  .brand .bt{font-size:26px;font-weight:800;letter-spacing:2px;line-height:1.1}
+  .brand .bs{font-size:12px;color:var(--ink3);letter-spacing:4px;margin-top:3px}
+  .bar .sp{flex:1}
+  .price{
+    font-size:17px;color:var(--ink2);background:var(--coral-soft);
+    padding:9px 18px;border-radius:24px;font-weight:600;
+    white-space:nowrap;flex:0 0 auto;   /* 不许被挤窄换行 */
+  }
+  .price b{color:var(--coral);font-size:21px;font-weight:800}
+  .paper{
+    display:flex;align-items:center;gap:10px;font-size:16px;color:var(--ink2);
+    white-space:nowrap;flex:0 0 auto;   /* 同上 */
+  }
+  .pbar{width:130px;height:11px;border-radius:6px;background:#F0E0D8;overflow:hidden}
+  .pfill{height:100%;width:0;background:var(--ok);transition:width .35s ease,background .35s ease}
+  .pfill.low{background:var(--warn)}
+  .pfill.out{background:var(--crit)}
+
+  .stage{position:relative;z-index:2;flex:1;display:grid;place-items:center;padding:30px 42px;min-height:0}
+  .panel{width:100%;text-align:center;transition:opacity .3s ease}
+  body.stale .panel{opacity:.32;filter:grayscale(.85)}
+
+  /* 空闲态 */
+  .idle .big{font-size:132px;font-weight:800;letter-spacing:6px;line-height:1.05;
+    background:linear-gradient(135deg,var(--coral2),var(--coral));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .idle .hint{margin-top:26px;font-size:30px;color:var(--ink2)}
+
+  /* 忙态 */
+  .busy .big{font-size:74px;font-weight:800;line-height:1.2;word-break:break-word}
+  .busy .sub{margin-top:28px;font-size:34px;color:var(--ink2)}
+  .busy .sub b{color:var(--coral);font-size:42px}
+
+  /* 待取件态 —— 全场最值钱的一屏 */
+  .pickup .label{font-size:34px;color:var(--ink2);letter-spacing:8px}
+  .pickup .code{
+    margin-top:14px;font-size:200px;font-weight:800;line-height:1;
+    letter-spacing:12px;
+    background:linear-gradient(135deg,var(--coral2),var(--coral));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 60px rgba(255,138,101,.28);
+  }
+  .pickup .tip{margin-top:22px;font-size:28px;color:var(--ink2)}
+  .pickup{animation:blink 1.15s steps(1,end) infinite}
+  @keyframes blink{0%,49%{background-color:transparent}50%,100%{background-color:rgba(255,138,101,.12)}}
+
+  .alertbar{
+    position:relative;z-index:3;flex:0 0 auto;padding:13px 42px;
+    background:rgba(217,72,59,.93);color:#fff;font-size:22px;font-weight:700;
+    display:none;align-items:center;gap:12px;
+  }
+  .alertbar.on{display:flex}
+
+  .foot{
+    position:relative;z-index:2;flex:0 0 auto;display:flex;align-items:center;gap:14px;
+    padding:14px 42px;border-top:1px solid #EADDD5;font-size:14px;color:var(--ink3);
+  }
+  .foot .sp{flex:1}
+  .tag{padding:3px 11px;border-radius:12px;background:#F5EDE7;font-size:12.5px;letter-spacing:1px}
+  .stalehint{color:var(--warn);font-weight:700;display:none}
+  body.stale .stalehint{display:inline}
+
+  .boot{
+    position:fixed;inset:0;z-index:9;display:grid;place-items:center;
+    background:var(--cream);color:var(--ink2);font-size:22px;
+  }
+  .boot.hide{display:none}
+</style>
+</head>
+<body>
+<div class="boot" id="boot">正在连接取件屏服务…</div>
+
+<div class="bar">
+  <div class="brand">
+    <span class="mark">印</span>
+    <div><div class="bt">思印客</div><div class="bs">SILNK</div></div>
+  </div>
+  <span class="sp"></span>
+  <div class="price">黑白 <b id="pPrice">0.30</b> 元/张</div>
+  <div class="paper">
+    <span>纸量</span>
+    <span class="pbar"><span class="pfill" id="pFill"></span></span>
+    <span id="pText">—</span>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="panel" id="panel">
+    <div class="idle" id="pIdle">
+      <div class="big">可打印</div>
+      <div class="hint">扫码下单 · 打印完成凭取件码取纸</div>
+    </div>
+    <div class="busy" id="pBusy" style="display:none">
+      <div class="big" id="busyTitle">正在打印…</div>
+      <div class="sub">前面还有 <b id="busyAhead">0</b> 人</div>
+    </div>
+    <div class="pickup" id="pPickup" style="display:none">
+      <div class="label">请凭取件码取件</div>
+      <div class="code" id="pkCode">0000</div>
+      <div class="tip">轻触屏幕确认取件</div>
+    </div>
+  </div>
+</div>
+
+<div class="alertbar" id="alertBar">
+  <span id="alertText">设备异常</span>
+</div>
+
+<div class="foot">
+  <span class="tag">Silnk Display</span>
+  <span id="devText">—</span>
+  <span class="sp"></span>
+  <span class="stalehint">连接中断 · 显示最后一帧</span>
+  <span id="tsText"></span>
+</div>
+
+<script>
+(function () {
+  var POLL_MS = 3000;
+  var params = new URLSearchParams(location.search);
+  var DEVICE = params.get('device_id') || '';
+  var KEY = params.get('key') ||
+            localStorage.getItem('pp_key') || '';
+
+  function el(id) { return document.getElementById(id); }
+
+  function setState(state) {
+    ['pIdle', 'pBusy', 'pPickup'].forEach(function (id) {
+      el(id).style.display = (id === 'p' + state.charAt(0).toUpperCase() + state.slice(1))
+        ? 'block' : 'none';
+    });
+  }
+
+  function render(d) {
+    document.body.classList.remove('stale');
+    el('devText').textContent = d.device_id || DEVICE || '';
+    el('tsText').textContent = d.ts
+      ? new Date(d.ts * 1000).toLocaleTimeString() : '';
+
+    // 价格
+    if (d.price && d.price.a4_bw != null) {
+      el('pPrice').textContent = Number(d.price.a4_bw).toFixed(2);
+    }
+
+    // 纸量
+    var p = d.paper || {};
+    var lv = p.level || 'none';
+    var fill = el('pFill');
+    fill.className = 'pfill' + (lv === 'low' ? ' low' : (lv === 'out' ? ' out' : ''));
+    if (lv === 'out') { fill.style.width = '100%'; }
+    else if (lv === 'none') { fill.style.width = '0%'; }
+    else if (lv === 'low') { fill.style.width = '18%'; }
+    else { fill.style.width = '62%'; }
+    el('pText').textContent = p.sheets != null ? (p.sheets + ' 张') : '未知';
+
+    // 三态
+    var st = d.state || 'idle';
+    setState(st);
+    if (st === 'busy') {
+      var q = d.queue || [];
+      var title = q.length ? (q[0].title || q[0].order_no || '') : '';
+      el('busyTitle').textContent = title || '正在打印…';
+      var ahead = Math.max(0, (d.queue_len || 0) - 1);
+      el('busyAhead').textContent = ahead;
+    }
+    if (st === 'pickup' && d.pickup) {
+      el('pkCode').textContent = d.pickup.code || '----';
+    }
+
+    // 告警条
+    var al = d.alerts || [];
+    if (al.length) {
+      el('alertBar').classList.add('on');
+      el('alertText').textContent = '设备异常：' +
+        al.map(function (a) { return a.code || ''; }).filter(Boolean).join(' / ');
+    } else {
+      el('alertBar').classList.remove('on');
+    }
+
+    el('boot').classList.add('hide');
+  }
+
+  function markStale() {
+    // 断网不清屏：只置灰，保留最后一帧（计划 L1 达标标准）
+    document.body.classList.add('stale');
+  }
+
+  function poll() {
+    if (!DEVICE) {
+      el('boot').textContent = '缺少 device_id 参数';
+      return;
+    }
+    fetch('/api/display/' + encodeURIComponent(DEVICE) + '/state', {
+      headers: KEY ? { Authorization: 'Bearer ' + KEY } : {}
+    })
+      .then(function (r) {
+        if (r.status === 401 || r.status === 403) {
+          throw new Error('未授权');
+        }
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(render)
+      .catch(function () { markStale(); })
+      .then(function () { setTimeout(poll, POLL_MS); });
+  }
+
+  poll();
+})();
+</script>
+</body>
+</html>

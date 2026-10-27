@@ -1,0 +1,16 @@
+{
+  "id": "general_homework",
+  "name": "通用作业模板",
+  "margins_mm": {"top": 20, "bottom": 20, "left": 20, "right": 20},
+  "font_whitelist": [
+    "simsun", "songti", "stsong", "nsimsun", "宋体",
+    "simhei", "heiti", "stheiti", "黑体",
+    "times", "timesnewroman", "arial", "calibri", "cambria",
+    "microsoftyahei", "yahei", "微软雅黑"
+  ],
+  "line_spacing": 1.5,
+  "page_number_required": false,
+  "cover_required": false,
+  "references_required": false,
+  "reference_min_entries": 0
+}

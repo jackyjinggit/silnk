@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 价格对比</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+</head>
+<body data-page="price">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem active" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>价格对比</h1>
+        <div class="crumb">本方案与商用对照的单价</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>打印单价设置（全局默认）</h3><span class="c">改完立即对新订单与用户端显示生效</span></div>
+        <div class="form on">
+          <div class="fgrid">
+            <div class="fg">
+              <label>单面黑白（元/页）<b>*</b></label>
+              <input id="p-bw" type="number" min="0.01" step="0.01" placeholder="0.30">
+            </div>
+            <div class="fg">
+              <label>单面彩色（元/页）<b>*</b></label>
+              <input id="p-color" type="number" min="0.01" step="0.01" placeholder="0.80">
+            </div>
+            <div class="fg">
+              <label>双面黑白（元/张）<b>*</b></label>
+              <input id="p-bw-duplex" type="number" min="0.01" step="0.01" placeholder="0.50">
+            </div>
+            <div class="fg">
+              <label>双面彩色（元/张）<b>*</b></label>
+              <input id="p-color-duplex" type="number" min="0.01" step="0.01" placeholder="1.50">
+            </div>
+            <div class="fg">
+              <label>当前生效价</label>
+              <input id="p-current" type="text" readonly>
+            </div>
+          </div>
+          <div class="factions">
+            <button class="btn primary" id="p-save">保存单价</button>
+            <span class="fmsg" id="p-msg"></span>
+          </div>
+          <div class="fnote" id="p-note">
+            说明：单面按页计价（元/页），双面按张计价（一张纸两面，元/张）；
+            双面奇数页时，剩下的一页按单面价计。彩色按覆盖率分档：&lt;0.5% 按黑白价、
+            0.5–5% 五折、5–30% 八折、&gt;30% 全价（双面按两面平均档位）。
+            只支持 A4/A5/A6，单文件最大 100MB。用户端下单页会实时拉取这里的单价，
+            因此改完请刷新用户端查看。历史订单金额不追溯调整。单独定价的机器不受全局价影响，见下方「每台机器定价」。
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>每台机器定价</h3><span class="c">每台机器可单独定价；未设置的跟随全局价</span></div>
+        <div class="wrap tprice">
+          <table>
+            <thead><tr><th>机器</th><th>名称</th><th>单面黑白(元/页)</th><th>单面彩色(元/页)</th><th>双面黑白(元/张)</th><th>双面彩色(元/张)</th><th>价格来源</th><th>操作</th></tr></thead>
+            <tbody id="dev-price"><tr><td colspan="8" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="tfoot">
+          <span class="fmsg" id="dp-msg"></span>
+          <div class="fnote">
+            这里的价是该机实际结算价，用户端选中该机器时展示与结算都用这份价。
+            「恢复全局」表示删除该机独立价、改为跟随全局默认价。
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>价格对比</h3><span class="c">本方案 vs 商用对照</span></div>
+        <div class="price" id="price"><div class="pc"><div class="n">加载中…</div></div></div>
+        <div class="summary" id="summary">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+
+/* 表单回填：只在数据变了、且用户没停在输入框上时才覆盖，避免打断输入 */
+let cfgSig = "";
+
+const PRICE_INPUTS = ["p-bw", "p-color", "p-bw-duplex", "p-color-duplex"];
+
+function renderEdit(cfg) {
+  const ae = document.activeElement;
+  const editing = ae && PRICE_INPUTS.includes(ae.id);
+  const sig = [cfg.bw, cfg.color, cfg.bw_duplex, cfg.color_duplex].join("/");
+  if (!editing && sig !== cfgSig) {
+    cfgSig = sig;
+    document.getElementById("p-bw").value = cfg.bw;
+    document.getElementById("p-color").value = cfg.color;
+    document.getElementById("p-bw-duplex").value = cfg.bw_duplex;
+    document.getElementById("p-color-duplex").value = cfg.color_duplex;
+  }
+  document.getElementById("p-current").value =
+    "单面 黑白 " + cfg.bw + " / 彩色 " + cfg.color + " 元/页 · 双面 黑白 " +
+    cfg.bw_duplex + " / 彩色 " + cfg.color_duplex + " 元/张";
+  document.getElementById("p-note").textContent =
+    (cfg.updated_at ? "上次修改：" + cfg.updated_at + "。" : "尚未修改过，当前为默认价。") +
+    " 说明：单面按页计价（元/页），双面按张计价（一张纸两面，元/张）；双面奇数页时，剩下的一页按单面价计。彩色按覆盖率分档：<0.5% 按黑白价、0.5–5% 五折、5–30% 八折、>30% 全价（双面按两面平均档位）。只支持 A4/A5/A6，单文件最大 100MB。用户端下单页会实时拉取这里的单价，改完请刷新用户端查看。历史订单金额不追溯调整。单独定价的机器不受全局价影响，见下方「每台机器定价」。";
+}
+
+async function savePrice() {
+  const msg = document.getElementById("p-msg");
+  const body = {};
+  for (const id of PRICE_INPUTS) {
+    const v = document.getElementById(id).value.trim();
+    if (v !== "") body[id.replace("p-", "").replace(/-/g, "_")] = Number(v);
+  }
+  if (!Object.keys(body).length) {
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：至少填一项单价";
+    return;
+  }
+  const btn = document.getElementById("p-save");
+  btn.disabled = true;
+  msg.style.color = "var(--ink-2)";
+  msg.textContent = "保存中…";
+  try {
+    const r = await PP.postFull("/api/price/config", body);
+    if (r.message !== "success") throw new Error(r.message || "保存失败");
+    const cfg = r.data || {};
+    msg.style.color = "var(--ok)";
+    msg.textContent = "已保存：单面 黑白 " + cfg.bw + " / 彩色 " + cfg.color +
+      " 元/页，双面 黑白 " + cfg.bw_duplex + " / 彩色 " + cfg.color_duplex + " 元/张";
+    cfgSig = "";
+    const ae = document.activeElement;
+    if (ae && ae.blur) ae.blur();
+    load();
+  } catch (e) {
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：" + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderPrice(p) {
+  const us = p.us, pc = p.papercut;
+  document.getElementById("price").innerHTML = `
+    <div class="pc win">
+      <div class="n">${esc(us.name)}</div><div class="tag">SELF-SERVICE · 本方案</div>
+      <div class="big">${us.bw_per_page}<small>元 / 黑白页</small></div>
+      <div class="li">彩色 ${us.color_per_page} 元 / 页　·　起收 ${us.min_charge} 元</div>
+      <div class="li">双面 黑白 ${us.bw_duplex_per_sheet} / 彩色 ${us.color_duplex_per_sheet} 元 / 张</div>
+      <div class="li">${esc(us.payment)}</div>
+    </div>
+    <div class="pc">
+      <div class="n">${esc(pc.name)}</div><div class="tag">COMMERCIAL · 商用对照</div>
+      <div class="big">${pc.bw_per_page}<small>元 / 黑白页</small></div>
+      <div class="li">彩色 ${pc.color_per_page} 元 / 页　·　起收 ${pc.min_charge} 元</div>
+      <div class="li">双面 黑白 ${pc.bw_duplex_per_sheet} / 彩色 ${pc.color_duplex_per_sheet} 元 / 张</div>
+      <div class="li">${esc(pc.payment)}</div>
+    </div>`;
+  document.getElementById("summary").textContent = p.summary || "";
+  if (p.config) renderEdit(p.config);
+}
+
+/* 每台机器定价：数据没变就不重绘；用户正停在输入框上时不重绘，避免打断输入 */
+let dpSig = "";
+
+function renderDevicePrices(d) {
+  const devices = (d && d.devices) || [];
+  const ae = document.activeElement;
+  const editing = ae && ae.classList && ae.classList.contains("pin");
+  if (editing) return;
+  const sig = devices.map(x => [x.device_id, x.name, x.bw, x.color,
+    x.bw_duplex, x.color_duplex, x.source].join("~")).join("|");
+  if (sig === dpSig) return;
+  dpSig = sig;
+  const body = document.getElementById("dev-price");
+  if (!devices.length) {
+    body.innerHTML = '<tr><td colspan="8" class="empty">暂无设备 —— 用户端接入后出现在这里</td></tr>';
+    return;
+  }
+  body.innerHTML = devices.map(x => {
+    const own = x.source === "device";
+    return `<tr data-dev="${esc(x.device_id)}">
+      <td class="m">${esc(x.device_id)}</td>
+      <td>${esc(x.name || "—")}</td>
+      <td><input class="pin" type="number" step="0.01" min="0.01" value="${esc(x.bw)}"></td>
+      <td><input class="pin" type="number" step="0.01" min="0.01" value="${esc(x.color)}"></td>
+      <td><input class="pin" type="number" step="0.01" min="0.01" value="${esc(x.bw_duplex)}"></td>
+      <td><input class="pin" type="number" step="0.01" min="0.01" value="${esc(x.color_duplex)}"></td>
+      <td><span class="pill ${own ? "on" : "off"}">${own ? "独立定价" : "跟随全局"}</span></td>
+      <td><div class="acts">
+        <button class="btn sm primary" data-save>保存</button>
+        <button class="btn sm" data-reset>恢复全局</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+async function saveDevicePrice(deviceId, tr) {
+  const msg = document.getElementById("dp-msg");
+  const inputs = tr.querySelectorAll("input.pin");
+  const body = {};
+  ["bw", "color", "bw_duplex", "color_duplex"].forEach((key, i) => {
+    const v = inputs[i] && inputs[i].value.trim();
+    if (v) body[key] = Number(v);
+  });
+  if (!Object.keys(body).length) {
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：至少填一项单价";
+    return;
+  }
+  msg.style.color = "var(--ink-2)";
+  msg.textContent = "保存中…";
+  try {
+    const r = await PP.postFull("/api/price/device/" + encodeURIComponent(deviceId), body);
+    if (r.message !== "success") throw new Error(r.message || "保存失败");
+    const price = (r.data && r.data.price) || body;
+    msg.style.color = "var(--ok)";
+    msg.textContent = "已保存：" + deviceId + " 单面 黑白 " + price.bw + " / 彩色 " +
+      price.color + " 元/页，双面 黑白 " + price.bw_duplex + " / 彩色 " +
+      price.color_duplex + " 元/张";
+    dpSig = "";
+    const ae = document.activeElement;
+    if (ae && ae.blur) ae.blur();
+    load();
+  } catch (e) {
+    msg.style.color = "var(--crit)";
+    msg.textContent = "保存失败：" + e.message;
+  }
+}
+
+async function resetDevicePrice(deviceId) {
+  const msg = document.getElementById("dp-msg");
+  msg.style.color = "var(--ink-2)";
+  msg.textContent = "恢复中…";
+  try {
+    await PP.del("/api/price/device/" + encodeURIComponent(deviceId));
+    msg.style.color = "var(--ok)";
+    msg.textContent = "已恢复：" + deviceId + " 改为跟随全局价";
+    dpSig = "";
+    load();
+  } catch (e) {
+    msg.style.color = "var(--crit)";
+    msg.textContent = "恢复失败：" + e.message;
+  }
+}
+
+document.getElementById("dev-price").addEventListener("click", ev => {
+  const tr = ev.target.closest("tr[data-dev]");
+  if (!tr) return;
+  const deviceId = tr.getAttribute("data-dev");
+  if (ev.target.closest("button[data-save]")) saveDevicePrice(deviceId, tr);
+  else if (ev.target.closest("button[data-reset]")) resetDevicePrice(deviceId);
+});
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：页面不含内置密钥，请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const [pr, dv] = await Promise.all([
+      PP.api("/api/price/compare"),
+      PP.api("/api/price/devices"),
+    ]);
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    renderPrice(pr);
+    renderDevicePrices(dv);
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+document.getElementById("p-save").onclick = savePrice;
+PP.boot(load);
+</script>
+</body>
+</html>

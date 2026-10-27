@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>思印客 Silnk · 作品介绍</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root{
+    --ink:#14161A;
+    --sub:#5A6070;
+    --line:#E3E5EA;
+    --blue:#4C63F0;
+    --coral:#FF7043;
+    --paper:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#ECEDF0}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Source Han Sans SC",sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    font-size:8.9pt;
+    line-height:1.55;
+  }
+  .page{
+    width:210mm;min-height:297mm;margin:16px auto;background:var(--paper);
+    padding:10mm 13mm 8mm;position:relative;
+    box-shadow:0 2px 18px rgba(20,22,26,.10);
+  }
+  /* header */
+  header{display:flex;justify-content:space-between;align-items:flex-end;
+    padding-bottom:4.6mm;border-bottom:1.6px solid var(--ink)}
+  .brand{font-size:22pt;font-weight:700;letter-spacing:.04em;line-height:1.05}
+  .brand em{font-style:normal;color:var(--coral);font-size:12pt;font-weight:600;
+    letter-spacing:.18em;margin-left:8px;vertical-align:3px}
+  .tagline{margin-top:2mm;font-size:9.2pt;color:var(--sub);letter-spacing:.02em}
+  .meta{text-align:right;font-size:8pt;color:var(--sub);line-height:1.85;white-space:nowrap}
+  .meta b{color:var(--ink);font-weight:600}
+  /* lead */
+  .lead{margin-top:4mm;font-size:10.2pt;line-height:1.62;letter-spacing:.01em}
+  .lead strong{background:linear-gradient(transparent 62%, rgba(76,99,240,.16) 62%);
+    font-weight:600}
+  /* sections */
+  section{margin-top:4.4mm}
+  .h{display:flex;align-items:baseline;gap:8px;margin-bottom:2.2mm}
+  .h .n{font-size:7.4pt;font-weight:700;color:var(--blue);letter-spacing:.14em}
+  .h h2{font-size:10.6pt;font-weight:600;letter-spacing:.04em}
+  .h .rule{flex:1;height:1px;background:var(--line);transform:translateY(-3px)}
+  /* pain */
+  .pains{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+  .pain{border-top:2px solid var(--ink);padding-top:2.4mm}
+  .pain b{display:block;font-size:9.6pt;font-weight:600;margin-bottom:1.2mm}
+  .pain span{color:var(--sub);font-size:8.6pt;line-height:1.6}
+  /* flow */
+  .flow{display:flex;align-items:stretch;gap:0;margin-top:1mm}
+  .step{flex:1;padding:2.4mm 2mm;border:1px solid var(--line);position:relative;
+    display:flex;flex-direction:column;justify-content:center;text-align:center}
+  .step + .step{border-left:0}
+  .step i{font-style:normal;font-size:6.6pt;color:var(--sub);letter-spacing:.1em}
+  .step b{display:block;font-size:9pt;font-weight:600;margin-top:.6mm}
+  .step:nth-child(7){background:var(--ink);border-color:var(--ink)}
+  .step:nth-child(7) b{color:#fff}
+  .step:nth-child(7) i{color:rgba(255,255,255,.62)}
+  /* capability columns */
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:5.5mm}
+  .col h3{font-size:9.4pt;font-weight:600;padding-bottom:1.4mm;margin-bottom:1.8mm;
+    border-bottom:1px solid var(--line)}
+  .col h3 s{text-decoration:none;color:var(--blue);font-size:7.2pt;letter-spacing:.1em;
+    margin-right:5px;font-weight:700}
+  .col ul{list-style:none}
+  .col li{position:relative;padding-left:8px;margin-bottom:.7mm;font-size:8.3pt;
+    color:#33373F;line-height:1.5}
+  .col li::before{content:"";position:absolute;left:0;top:.55em;width:3px;height:3px;
+    background:var(--coral)}
+  /* innovation */
+  .inno{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 6mm}
+  .inno div{border-left:2.5px solid var(--blue);padding-left:3.2mm}
+  .inno b{display:block;font-size:9.2pt;font-weight:600;margin-bottom:.8mm}
+  .inno span{color:var(--sub);font-size:8.3pt;line-height:1.55}
+  /* evidence strip */
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);
+    margin-top:2mm}
+  .stat{padding:2.8mm 3mm;border-right:1px solid var(--line)}
+  .stat:last-child{border-right:0}
+  .stat b{display:block;font-size:11.4pt;font-weight:700;letter-spacing:-.02em}
+  .stat span{font-size:7.2pt;color:var(--sub);line-height:1.4;display:block;margin-top:.4mm}
+  /* footer */
+  footer{margin-top:4.2mm;padding-top:2.4mm;border-top:1.6px solid var(--ink);
+    display:flex;justify-content:space-between;gap:8mm;font-size:7.4pt;color:var(--sub)}
+  footer b{color:var(--ink);font-weight:600}
+  footer .r{text-align:right;white-space:nowrap}
+  @media print{
+    html,body{background:#fff}
+    .page{margin:0;box-shadow:none;width:auto;min-height:auto}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div>
+      <div class="brand">思印客<em>SILNK</em></div>
+      <div class="tagline">校园文档交付终端 · 让每一次打印都留下可查的证据</div>
+    </div>
+    <div class="meta">
+      赛道：<b>AI + 硬件 / 智慧校园</b><br>
+      形态：<b>Web + 边缘终端</b><br>
+      日期：<b>2026.10.25</b>
+    </div>
+  </header>
+
+  <p class="lead">
+    自助打印真正难的不是“把文件发到打印机”，而是<strong>打错、拿错、留下</strong>这三件事。
+    思印客把「上传 → 体检 → 计价 → 支付 → 打印 → 取件 → 删除」做成一条
+    <strong>可审计的交付链路</strong>：打印前先告警风险，打印中看得见真实设备，打印后用取件码与现场照片留证。
+  </p>
+
+  <section>
+    <div class="h"><span class="n">01</span><h2>为什么现有方案不够</h2><i class="rule"></i></div>
+    <div class="pains">
+      <div class="pain"><b>打错才被发现</b><span>彩页按黑白付、奇数页双面、混排尺寸、空白页，都在出纸后才暴露，纸张和钱已经花掉。</span></div>
+      <div class="pain"><b>拿错没人能证明</b><span>纸堆放在托盘上，谁取的、什么时候取的、有没有拿错，全靠人工回忆。</span></div>
+      <div class="pain"><b>文件留在机器里</b><span>源文件长期滞留在服务器与打印终端，删除动作没有记录，隐私无从追溯。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h"><span class="n">02</span><h2>一次下单的完整链路</h2><i class="rule"></i></div>
+    <div class="flow">
+      <div class="step"><i>01</i><b>上传</b></div>
+      <div class="step"><i>02</i><b>体检</b></div>
+      <div class="step"><i>03</i><b>计价</b></div>
+      <div class="step"><i>04</i><b>支付</b></div>
+      <div class="step"><i>05</i><b>打印</b></div>
+      <div class="step"><i>06</i><b>取件</b></div>
+      <div class="step"><i>07</i><b>删除留痕</b></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h"><span class="n">03</span><h2>三个阶段做了什么</h2><i class="rule"></i></div>
+    <div class="cols">
+      <div class="col">
+        <h3><s>BEFORE</s>打印前 · 先检查再收钱</h3>
+        <ul>
+          <li>空白页、彩色页、低分辨率图、混排尺寸、双面奇数页风险提示</li>
+          <li>论文 / 作业 / 实验报告 / 公文等 7 套格式模板打分与一键修复</li>
+          <li>A3 自动拆 A4、扫描件 OCR、多页合一排版</li>
+          <li>本地识别身份证 / 手机号 / 银行卡并一键打码</li>
+          <li>空白页不计费，前端预估与后端结算同一套逻辑</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><s>DURING</s>打印中 · 真实设备可查</h3>
+        <ul>
+          <li>Windows（SumatraPDF）与 Linux（CUPS）双客户端，旧打印机零配置接入</li>
+          <li>队列锁 + 条件更新，双客户端并发不重复抢单</li>
+          <li>心跳、纸量、四档状态、R1–R6 告警集中管理</li>
+          <li>智能选机：按队列、等待、距离、纸量与能力给出推荐理由</li>
+          <li>错峰预约出纸、班级批量姓名封皮、多人拼单</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><s>AFTER</s>打印后 · 交付可证明</h3>
+        <ul>
+          <li>手机端取件码，T5 屏在取件态显示大号码并可点击确认</li>
+          <li>取件幂等记录时间、序号与乱序，乱序触发告警</li>
+          <li>X5 摄像头以空托盘为基准，抓拍出纸现场图并绑定订单</li>
+          <li>预估价与结算价同一套规则，前端不另算一份</li>
+          <li>过期、完成、主动删除三类动作写入删除记录可审计</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h"><span class="n">04</span><h2>四个可演示的差异点</h2><i class="rule"></i></div>
+    <div class="inno">
+      <div><b>旧打印机零配置接入</b><span>图形向导只填服务器地址，自动发现本机队列并生成 4 位接入码，管理端批准即下发专属令牌，设备 8 秒上线。</span></div>
+      <div><b>T5 实时取件终端</b><span>串口接收真实状态、纸量、价格与取件码；三档链路状态区分连接中 / 在线 / 离线，未知数据一律显示 --。</span></div>
+      <div><b>X5 出纸视觉证据</b><span>出纸事件带唯一标识与现场照片，只在活动订单窗口上报，把“已出纸”从口头承诺变成可回看的证据。</span></div>
+      <div><b>体检与交付承诺</b><span>打印前提示三类风险；下单给出 ETA，超时免单与格式不符重印走独立状态机，不把提交打印命令等同于已出纸。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h"><span class="n">05</span><h2>真实跑出来的数据</h2><i class="rule"></i></div>
+    <div class="strip">
+      <div class="stat"><b>2.14 元</b><span>4 页彩色单面实结算（原价 3.20 元）</span></div>
+      <div class="stat"><b>97 → 100</b><span>格式体检得分，一键修复后满分</span></div>
+      <div class="stat"><b>220 项</b><span>后端与硬件逻辑自动化测试全过</span></div>
+      <div class="stat"><b>39 条</b><span>线上文件删除记录，三类原因可查</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <b>技术底座</b>　FastAPI + SQLite(WAL) + APScheduler ｜ Vue 3 ｜ CUPS / ipptool ｜ TuyaOpen LVGL ｜ RDK X5 + OpenCV
+      <br><b>验证边界</b>　硬件为真实设备联调；T5 取件点击闭环与长期稳定性仍在现场复核，未接入的能力在页面如实标注「待做」。
+    </div>
+    <div class="r">
+      仓库<br><b>github.com/wanghaosu0501/printpilot</b><br>团队：4 人 · 48 小时
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

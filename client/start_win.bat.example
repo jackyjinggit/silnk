@@ -1,0 +1,40 @@
+@echo off
+chcp 65001 >nul
+cd /d "%~dp0"
+
+REM ===== Run Get-Printer and copy the EXACT queue name below =====
+REM 复制本文件为 start_win.bat 后再改下面的值；start_win.bat 已被 .gitignore 忽略
+set "SERVER_HOST=http://YOUR_SERVER:8000"
+set "SECRET_KEY=REPLACE_WITH_SERVER_SECRET_KEY"
+set "PRINTER_NAME=HP Smart Tank 510 series"
+set "PRINTER_DEVICE_ID=printer-001"
+REM =======================================================
+
+REM Smart Tank 518 has a 100-sheet input tray
+set "PRINTER_PAPER_CAPACITY=100"
+REM Path to SumatraPDF.exe (portable build is fine)
+set "SUMATRAPDF_PATH=C:\Program Files\SumatraPDF\SumatraPDF.exe"
+REM 518 is manual duplex: force simplex so the "flip paper" dialog never blocks
+set "PRINTER_FORCE_SIMPLEX=1"
+
+where python >nul 2>nul
+if errorlevel 1 (
+  echo [ERROR] Python not found in PATH. Install Python 3 and enable "Add Python to PATH".
+  pause
+  exit /b 1
+)
+if "%SECRET_KEY%"=="REPLACE_WITH_SERVER_SECRET_KEY" (
+  echo [ERROR] Please set SECRET_KEY in this file first.
+  pause
+  exit /b 1
+)
+
+if not exist "main.py" (
+  echo [ERROR] main.py not found in this folder: %CD%
+  echo Put this .bat next to main.py ^(the client folder^), then run it again.
+  pause
+  exit /b 1
+)
+echo Starting printer client: device=%PRINTER_DEVICE_ID% printer="%PRINTER_NAME%"
+python main.py
+pause

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 资料库审核</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+<style>
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+  .kpi-s{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi-s b{display:block;font-size:22px;letter-spacing:-.03em}
+  .kpi-s span{font-size:11.5px;color:var(--ink-3)}
+  .libtabs{display:flex;gap:8px;margin-bottom:12px}
+  .libtab{height:32px;padding:0 14px;border:1px solid var(--line);border-radius:999px;
+    background:#fff;color:var(--ink-2);font:inherit;font-size:12.5px;cursor:pointer}
+  .libtab.on{background:var(--blue-50);border-color:var(--blue-100);color:var(--blue-700);font-weight:600}
+  .libcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff}
+  .libcard:last-child{margin-bottom:0}
+  .libh{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .libh b{font-size:14px;font-weight:600}
+  .libm{font-size:11.5px;color:var(--ink-3);margin-top:6px}
+  .libagent{font-size:11.5px;line-height:1.6;margin-top:8px;padding:8px 10px;border-radius:8px;
+    background:#F7F9FE;color:var(--ink-2)}
+  .libagent.ok{background:#EAF9F1;color:#12734A}
+  .libagent.warn{background:#FFF6E2;color:#9A6612}
+  .libagent.bad{background:#FDECEC;color:#B23A3A}
+  .libact{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .btn.danger{border-color:#F3C9C9;color:#D9483B;background:#FFF6F6}
+  .upbox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 16px}
+  .upbox input[type=file]{font-size:12.5px;max-width:280px;color:var(--ink-2)}
+  .upbox input[type=text],.upbox select{height:34px;padding:0 10px;border:1px solid var(--line);
+    border-radius:8px;font:inherit;font-size:12.5px;background:#fff;color:var(--ink);outline:none}
+  .upbox input[type=text]{flex:1;min-width:180px}
+  .upbox input:focus,.upbox select:focus{border-color:var(--blue)}
+  .upmsg{padding:0 16px 12px;font-size:12px;color:var(--ink-3);min-height:18px}
+  .upmsg.ok{color:var(--ok)}
+  .upmsg.bad{color:var(--crit)}
+  .catlist{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 12px}
+  .catchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 9px;
+    border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink-2)}
+  .catchip b{font-family:var(--num);font-size:10.5px;color:var(--ink-3)}
+  .catchip button{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:14px;
+    line-height:1;padding:0 0 0 2px}
+  .catchip button:hover{color:var(--crit)}
+  @media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body data-page="library">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem active" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>资料库审核</h1>
+        <div class="crumb">agent 初审后的二次复审：通过才公开，驳回不展示原因给用户</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal" style="margin-bottom:14px">
+        <div class="ch">
+          <h3>上传资料</h3>
+          <span class="c">PDF / Word / Excel，自动转 PDF 并直接公开</span>
+        </div>
+        <div class="upbox">
+          <input id="up-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx">
+          <input id="up-title" type="text" maxlength="60" placeholder="标题（留空用文件名）">
+          <select id="up-cat"></select>
+          <button class="btn primary" id="up-btn" type="button">上传并发布</button>
+        </div>
+        <div class="upmsg" id="up-msg">管理员上传视为已审核，发布后立即出现在资料库；Word/Excel 需要服务器安装 LibreOffice。</div>
+      </div>
+
+      <div class="card reveal" style="margin-bottom:14px">
+        <div class="ch">
+          <h3>分类管理</h3>
+          <span class="c">新增 / 删除；已被资料使用的分类不能删</span>
+        </div>
+        <div class="upbox">
+          <input id="cat-name" type="text" maxlength="20" placeholder="新分类名称">
+          <button class="btn primary" id="cat-add" type="button">新增分类</button>
+        </div>
+        <div class="catlist" id="cat-list"></div>
+        <div class="upmsg" id="cat-msg">分类不再写死：这里新增后，用户端下单页与资料库筛选会同步出现。</div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi-s"><b id="k-pend">0</b><span>待管理员复审</span></div>
+        <div class="kpi-s"><b id="k-agent">0</b><span>agent 初审中</span></div>
+        <div class="kpi-s"><b id="k-pub">0</b><span>已公开</span></div>
+        <div class="kpi-s"><b id="k-rej">0</b><span>已驳回</span></div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ch">
+          <h3>资料审核</h3>
+          <span class="c" id="lib-count">0 条</span>
+        </div>
+        <div style="padding:14px 16px 16px">
+          <div class="libtabs">
+            <button class="libtab on" data-tab="pending" type="button">待复审</button>
+            <button class="libtab" data-tab="published" type="button">已公开</button>
+            <button class="libtab" data-tab="rejected" type="button">已驳回</button>
+          </div>
+          <div id="lib-list"><div class="empty">等待数据…</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+let TAB = "pending";
+
+const AGENT_LABEL = {
+  pass: "通过", warn: "有风险，需人工确认", block: "违规，已自动拒绝",
+  unavailable: "未接入（转人工）", unknown: "调用失败（转人工）"
+};
+const STATUS_LABEL = {
+  pending_agent: "agent 初审中", pending_admin: "待管理员复审",
+  published: "已公开", rejected: "已驳回"
+};
+
+function agentClass(v){
+  if (v === "pass") return "ok";
+  if (v === "block") return "bad";
+  return "warn";
+}
+
+function card(d, tab){
+  const agent = d.agent_verdict
+    ? `<div class="libagent ${agentClass(d.agent_verdict)}">
+         agent 初审：${esc(AGENT_LABEL[d.agent_verdict] || d.agent_verdict)}
+         ${d.agent_reason ? " · " + esc(d.agent_reason) : ""}
+       </div>`
+    : `<div class="libagent warn">agent 初审中…</div>`;
+  const admin = d.admin_note
+    ? `<div class="libagent bad">管理员备注：${esc(d.admin_note)}</div>` : "";
+  const actions = (tab === "pending" && d.status === "pending_admin") ? `
+    <div class="libact">
+      <button class="btn sm" data-preview="${d.id}" type="button">预览</button>
+      <button class="btn sm primary" data-approve="${d.id}" type="button">通过并公开</button>
+      <button class="btn sm danger" data-reject="${d.id}" type="button">驳回</button>
+    </div>` : (tab === "pending" ? `
+    <div class="libact"><span class="libm">agent 初审中，稍后刷新</span></div>` : "");
+  return `<div class="libcard">
+    <div class="libh">
+      <b>${esc(d.title)}</b>
+      <span class="pill">${esc(d.category || "其他")}</span>
+      <span class="pill ${d.status === "published" ? "ok" : ""}">${esc(STATUS_LABEL[d.status] || d.status)}</span>
+    </div>
+    <div class="libm">
+      ${d.pages || 0} 页 · 上传者 ${esc(d.uploader_name || "—")} ·
+      订单 ${esc((d.order_no || "").slice(-10) || "—")} ·
+      已打印 ${d.print_count || 0} 次 / ${d.print_pages || 0} 页 ·
+      ${esc(d.created_at || "")}
+      ${d.status === "published" ? " · 已取用 " + (d.downloads || 0) + " 次" : ""}
+    </div>
+    ${agent}
+    ${admin}
+    ${actions}
+  </div>`;
+}
+
+/* 分类来自数据库，管理端可增删；用户端下单页与资料库筛选同步跟随 */
+async function loadCategories(){
+  const box = document.getElementById("cat-list");
+  const sel = document.getElementById("up-cat");
+  if (!PP.getKey()){
+    box.innerHTML = `<span class="catchip">配置密钥后显示分类</span>`;
+    return;
+  }
+  try{
+    const data = await PP.api("/api/library/admin/categories");
+    const cats = data.categories || [];
+    const keep = sel.value;
+    sel.innerHTML = cats.map(c =>
+      `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join("");
+    if (keep && cats.some(c => c.name === keep)) sel.value = keep;
+    box.innerHTML = cats.length ? cats.map(c =>
+      `<span class="catchip">${esc(c.name)}<b>${c.count || 0}</b>${
+        c.name === "其他" ? "" :
+        `<button type="button" data-del-cat="${esc(c.name)}" title="删除分类">×</button>`
+      }</span>`).join("")
+      : `<span class="catchip">还没有分类，请先新增</span>`;
+  }catch(e){
+    box.innerHTML = `<span class="catchip">分类加载失败：${esc(e.message)}</span>`;
+  }
+}
+
+/* 需要读取后端业务 message（失败原因），所以不走 PP.api 的 data 裁剪 */
+async function apiFull(path, opts){
+  const o = opts || {};
+  const headers = Object.assign(
+    { Authorization: "Bearer " + PP.getKey() }, o.headers || {});
+  const res = await fetch(path, Object.assign({}, o, { headers }));
+  if (res.status === 401) throw new Error("密钥无效（401）");
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.message || ("HTTP " + res.status));
+  return body;
+}
+
+function catMsg(text, cls){
+  const el = document.getElementById("cat-msg");
+  el.className = "upmsg" + (cls ? " " + cls : "");
+  el.textContent = text;
+}
+
+document.getElementById("cat-add").addEventListener("click", async () => {
+  const btn = document.getElementById("cat-add");
+  const input = document.getElementById("cat-name");
+  const name = input.value.trim();
+  if (!PP.getKey()){ catMsg("请先点右上角「密钥」配置管理端密钥", "bad"); return; }
+  if (!name){ catMsg("请输入分类名称", "bad"); return; }
+  btn.disabled = true;
+  try{
+    const body = await apiFull("/api/library/admin/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name })
+    });
+    if (body.data && body.data.ok){
+      input.value = "";
+      catMsg(`已新增分类「${name}」`, "ok");
+      await loadCategories();
+    } else {
+      catMsg(body.message || "新增失败", "bad");
+    }
+  }catch(e){
+    catMsg("新增失败：" + e.message, "bad");
+  }
+  btn.disabled = false;
+});
+
+document.getElementById("cat-list").addEventListener("click", async (ev) => {
+  const name = ev.target.getAttribute && ev.target.getAttribute("data-del-cat");
+  if (!name) return;
+  if (!window.confirm(`确认删除分类「${name}」？`)) return;
+  try{
+    const body = await apiFull(
+      "/api/library/admin/categories/" + encodeURIComponent(name),
+      { method: "DELETE" });
+    if (body.data && body.data.ok){
+      catMsg(`已删除分类「${name}」`, "ok");
+      await loadCategories();
+    } else {
+      catMsg(body.message || "删除失败", "bad");
+    }
+  }catch(e){
+    catMsg("删除失败：" + e.message, "bad");
+  }
+});
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：页面不含内置密钥，请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  loadCategories();
+  try{
+    const data = await PP.api("/api/library/admin/list?status=" + encodeURIComponent(TAB));
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    const counts = data.counts || {};
+    document.getElementById("k-pend").textContent = counts.pending_admin || 0;
+    document.getElementById("k-agent").textContent = counts.pending_agent || 0;
+    document.getElementById("k-pub").textContent = counts.published || 0;
+    document.getElementById("k-rej").textContent = counts.rejected || 0;
+    PP.setCounts({ library: (counts.pending_admin || 0) + (counts.pending_agent || 0) });
+    const docs = data.docs || [];
+    document.getElementById("lib-count").textContent = docs.length + " 条";
+    document.getElementById("lib-list").innerHTML = docs.length
+      ? docs.map(d => card(d, TAB)).join("")
+      : `<div class="empty">${
+          TAB === "pending" ? "没有待复审的资料" :
+          TAB === "published" ? "还没有公开的资料" : "没有已驳回的资料"
+        }</div>`;
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+
+document.querySelectorAll(".libtab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".libtab").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    TAB = btn.getAttribute("data-tab");
+    load();
+  });
+});
+
+document.getElementById("lib-list").addEventListener("click", async (ev) => {
+  const el = ev.target;
+  const id = el.getAttribute && (el.getAttribute("data-preview")
+    || el.getAttribute("data-approve") || el.getAttribute("data-reject"));
+  if (!id) return;
+
+  if (el.hasAttribute("data-preview")){
+    const win = window.open("", "_blank");
+    try{
+      const res = await fetch("/api/library/admin/" + id + "/preview", {
+        headers: {Authorization: "Bearer " + PP.getKey()}
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const blob = await res.blob();
+      if (win) win.location = URL.createObjectURL(blob);
+    }catch(e){
+      if (win) win.close();
+      PP.showErr("预览失败：" + e.message);
+    }
+    return;
+  }
+
+  if (el.hasAttribute("data-approve")){
+    if (!window.confirm("确认通过并公开？请确认文件不含身份证号、手机号等隐私信息。")) return;
+    el.disabled = true;
+    try{
+      await PP.post("/api/library/admin/" + id + "/approve");
+      PP.showErr(null);
+    }catch(e){ PP.showErr("通过失败：" + e.message); }
+    load();
+    return;
+  }
+
+  if (el.hasAttribute("data-reject")){
+    const reason = window.prompt("驳回原因（只记录在管理端，不会公开）", "");
+    if (reason === null) return;
+    el.disabled = true;
+    try{
+      await PP.post("/api/library/admin/" + id + "/reject", {reason: reason});
+      PP.showErr(null);
+    }catch(e){ PP.showErr("驳回失败：" + e.message); }
+    load();
+  }
+});
+
+document.getElementById("btn-refresh").addEventListener("click", load);
+
+/* 管理员上传：PDF 直接发布；Word/Excel 由后端转 PDF 后发布 */
+document.getElementById("up-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("up-btn");
+  const msg = document.getElementById("up-msg");
+  const input = document.getElementById("up-file");
+  const file = input.files && input.files[0];
+  if (!PP.getKey()) {
+    msg.className = "upmsg bad";
+    msg.textContent = "请先点右上角「密钥」配置管理端密钥";
+    return;
+  }
+  if (!file) {
+    msg.className = "upmsg bad";
+    msg.textContent = "请选择要上传的 PDF / Word / Excel 文件";
+    return;
+  }
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("title", document.getElementById("up-title").value.trim());
+  fd.append("category", document.getElementById("up-cat").value);
+
+  btn.disabled = true;
+  msg.className = "upmsg";
+  msg.textContent = "上传中…（Word/Excel 需要转换，请稍候）";
+  try {
+    const res = await fetch("/api/library/admin/upload", {
+      method: "POST",
+      headers: {Authorization: "Bearer " + PP.getKey()},
+      body: fd
+    });
+    const body = await res.json();
+    if (body.message === "success") {
+      msg.className = "upmsg ok";
+      msg.textContent = "已发布：" + body.data.title + "（" + body.data.pages + " 页）";
+      input.value = "";
+      document.getElementById("up-title").value = "";
+      TAB = "published";
+      document.querySelectorAll(".libtab").forEach(b => {
+        b.classList.toggle("on", b.getAttribute("data-tab") === "published");
+      });
+      load();
+    } else {
+      msg.className = "upmsg bad";
+      msg.textContent = body.message || "上传失败";
+    }
+  } catch (e) {
+    msg.className = "upmsg bad";
+    msg.textContent = "上传失败：" + e.message;
+  }
+  btn.disabled = false;
+});
+
+PP.boot(load);
+</script>
+</body>
+</html>

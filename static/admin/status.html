@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 接入状态</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+</head>
+<body data-page="status">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem active" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>接入状态</h1>
+        <div class="crumb">已接入能力与待做项，如实标注</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal">
+        <div class="ch"><h3>接入状态与待做</h3><span class="c">如实标注 · 不编造</span></div>
+        <div id="status-runtime" style="padding:14px 20px;border-bottom:1px solid var(--line);background:var(--surface);
+          font-size:12.5px;color:var(--ink-2);font-family:var(--num)">等待数据…</div>
+        <div class="wrap">
+          <table>
+            <thead><tr><th>能力</th><th>状态</th><th>说明</th></tr></thead>
+            <tbody id="status-rows"><tr><td colspan="3" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card reveal" style="margin-top:16px">
+        <div class="ch"><h3>文件删除记录</h3><span class="c">15 分钟过期 · 打印完成 5 分钟 · 失败残留 24 小时</span></div>
+        <div class="wrap">
+          <table>
+            <thead><tr><th>时间</th><th>文件</th><th>订单</th><th>原因</th></tr></thead>
+            <tbody id="del-rows"><tr><td colspan="4" class="empty">等待数据…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc } = PP;
+
+function renderStatus(st){
+  const rt = st.runtime || {};
+  document.getElementById("status-runtime").innerHTML =
+    "运行时事实（读自数据库，非手写）—— 设备 " + (rt.devices_total ?? 0) +
+    " 台 · 有心跳 " + (rt.devices_with_heartbeat ?? 0) +
+    " 台 · 订单 " + (rt.jobs_total ?? 0) +
+    " 单 · 告警 " + (rt.alerts_total ?? 0) + " 条";
+  const rows = st.declared || [];
+  const body = document.getElementById("status-rows");
+  if (!rows.length){ body.innerHTML = '<tr><td colspan="3" class="empty">无声明条目</td></tr>'; return; }
+  body.innerHTML = rows.map(r => {
+    const done = r.status === "已接入";
+    return `<tr>
+      <td>${esc(r.title)}</td>
+      <td><span class="pill ${done ? "on" : "warn"}">${esc(r.status)}</span></td>
+      <td style="white-space:normal;color:var(--ink-2);font-size:13px">${esc(r.note)}</td>
+    </tr>`;
+  }).join("");
+}
+
+const DEL_REASON = {
+  expired: "15 分钟未活跃",
+  printed: "打印完成 5 分钟",
+  stale: "失败残留 24 小时",
+  startup: "服务启动清理",
+  manual: "用户主动删除",
+};
+
+async function loadDeletions(){
+  const body = document.getElementById("del-rows");
+  try{
+    const data = await PP.api("/api/file/deletions?limit=100");
+    const rows = data.deletions || [];
+    body.innerHTML = rows.length ? rows.map(r => `<tr>
+      <td class="m">${esc(r.deleted_at || "")}</td>
+      <td><span class="fn" title="${esc(r.filename || "")}">${esc(r.filename || "")}</span></td>
+      <td class="m">${esc(r.order_no || "—")}</td>
+      <td>${esc(DEL_REASON[r.reason] || r.reason || "")}</td>
+    </tr>`).join("") : '<tr><td colspan="4" class="empty">暂无删除记录</td></tr>';
+  }catch(e){
+    body.innerHTML = '<tr><td colspan="4" class="empty">读取失败：' + esc(e.message) + '</td></tr>';
+  }
+}
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：页面不含内置密钥，请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const st = await PP.api("/api/status");
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    renderStatus(st);
+    loadDeletions();
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+PP.boot(load);
+</script>
+</body>
+</html>

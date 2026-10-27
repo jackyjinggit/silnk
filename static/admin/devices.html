@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>思印客 Silnk · 运营管理台 · 设备</title>
+<link rel="stylesheet" href="assets/admin.css?v=3">
+<style>body[data-role="ops"] #claim-card{display:none!important}</style>
+</head>
+<body data-page="devices">
+<div class="app">
+
+  <aside class="side">
+    <a class="sbrand" href="index.html">
+      <span class="mark">印</span>
+      <div><div class="bt">思印客</div><div class="bs">Silnk</div></div>
+    </a>
+    <nav class="snav">
+      <a class="sitem" data-page="overview" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        概览</a>
+      <a class="sitem active" data-page="devices" href="devices.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M8 9h8M8 13h4"/></svg>
+        设备<span class="cnt" id="nav-dev">0</span></a>
+      <a class="sitem" data-page="display" href="display.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        取件屏<span class="cnt" id="nav-disp">0</span></a>
+      <a class="sitem" data-page="orders" href="orders.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        订单<span class="cnt" id="nav-ord">0</span></a>
+      <a class="sitem" data-page="billing" href="billing.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        账单<span class="cnt" id="nav-pay">0</span></a>
+      <a class="sitem" data-page="reports" href="reports.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        统计报表</a>
+      <a class="sitem" data-page="alerts" href="alerts.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 9v5M12 17h.01"/></svg>
+        告警<span class="cnt" id="nav-al">0</span></a>
+      <a class="sitem" data-page="price" href="price.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+        价格对比</a>
+      <a class="sitem" data-page="users" href="users.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5M18 20c0-2.2-.8-3.7-2-4.6"/></svg>
+        用户</a>
+      <a class="sitem" data-page="library" href="library.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M7 9h1M17 9h1"/></svg>
+        资料库<span class="cnt" id="nav-lib">0</span></a>
+      <a class="sitem" data-page="tenants" href="tenants.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2M13 9h2M9 13h2M13 13h2M9 17h6"/></svg>
+        租户与结算</a>
+      <a class="sitem" data-page="status" href="status.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        接入状态</a>
+    </nav>
+    <div class="sfoot">思印客 Silnk<br>运营管理台 · <span id="f-host">—</span></div>
+  </aside>
+
+  <div class="area">
+    <div class="topbar">
+      <div>
+        <h1>设备</h1>
+        <div class="crumb">设备清单、纸张状态与队列深度</div>
+      </div>
+      <div class="tb-right">
+        <span class="status" id="live"><i></i><span id="livetxt">连接中</span></span>
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="btn sm" id="btn-key">密钥</button>
+        <button class="btn sm primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="err" id="err"></div>
+
+      <div class="card reveal" id="claim-card" style="display:none;margin-bottom:14px">
+        <div class="ch"><h3>待接入设备</h3><span class="c"><span id="claim-count">0 台</span></span></div>
+        <div id="claims"></div>
+      </div>
+
+      <div class="grid2">
+        <div class="card reveal">
+          <div class="ch"><h3>设备</h3>
+            <span class="c"><span class="pe-msg" id="paper-msg"></span>
+              <span id="dev-count">0 台</span>
+              <button class="btn sm" id="btn-new" style="margin-left:10px">＋ 新增设备</button></span>
+          </div>
+          <div class="form" id="new-form">
+            <div class="fgrid">
+              <div class="fg" style="grid-column:1/-1">
+                <label>从打印机端发现 <span style="color:var(--ink-3);font-weight:400">（客户端上报的本机队列，支持 Windows 驱动与 CUPS）</span></label>
+                <div style="display:flex;gap:8px">
+                  <select id="nf-discovered" style="flex:1">
+                    <option value="">选择一台已发现的打印机，自动填入下面的信息</option>
+                  </select>
+                  <button class="btn sm" type="button" id="btn-discovered-refresh">刷新</button>
+                </div>
+              </div>
+              <div class="fg"><label>设备ID <b>*</b></label><input id="nf-device_id" placeholder="printer-003"></div>
+              <div class="fg"><label>名称</label><input id="nf-name" placeholder="三楼阅览室 · 佳能"></div>
+              <div class="fg"><label>型号</label><input id="nf-model" placeholder="Canon G3800"></div>
+              <div class="fg"><label>驱动</label><input id="nf-driver" placeholder="cnijfilter2"></div>
+              <div class="fg"><label>连接地址</label><input id="nf-conn" placeholder="192.168.1.103"></div>
+              <div class="fg"><label>纸盒容量（张）</label><input id="nf-paper_capacity" type="number" min="0" placeholder="250"></div>
+              <div class="fg"><label>纸张状态</label><select id="nf-paper_state">
+                <option value="">未上报</option><option value="full">满纸</option>
+                <option value="half">半纸</option><option value="low">少纸</option><option value="empty">缺纸</option>
+              </select></div>
+            </div>
+            <div class="factions">
+              <button class="btn primary" id="btn-new-submit">写入数据库</button>
+              <button class="btn" id="btn-new-cancel">取消</button>
+              <span class="fmsg" id="nf-msg"></span>
+            </div>
+            <div class="fnote">任何装了 Windows 驱动或 CUPS 队列的打印机都可以接；型号/驱动只作展示，不影响实际打印。
+              一个 client 进程对应一个队列，同一台电脑接第二台打印机时，请再启动一个 client 并设置不同的 PRINTER_DEVICE_ID。
+              新增后状态为「离线」，直到现场客户端以同一设备ID 上报心跳。</div>
+          </div>
+          <div id="devices"><div class="empty">等待数据…</div></div>
+        </div>
+        <div class="card reveal" style="animation-delay:.06s">
+          <div class="ch"><h3>告警</h3><span class="c" id="al-count">0 条</span></div>
+          <div id="alerts-mini"><div class="empty">等待数据…</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh">管理端密钥</div>
+    <div class="mb">
+      <p>请输入与后端一致的 SECRET_KEY（后端由环境变量注入）。密钥只保存在本机浏览器，不会写入页面源码。</p>
+      <input id="key-input" type="password" placeholder="SECRET_KEY" autocomplete="off">
+      <div class="mn">当前值前 8 位：<span id="key-hint">未配置</span></div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="key-cancel">取消</button>
+      <button class="btn primary" id="key-save">保存并刷新</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="claim-mask">
+  <div class="modal">
+    <div class="mh">批准接入</div>
+    <div class="mb">
+      <p id="cm-hint">确认设备与打印机队列后填写点位信息，设备端会自动拿到令牌并上线。</p>
+      <div class="fg"><label>点位名称</label><input id="cm-name" placeholder="一楼大厅 · 佳能 G3800"></div>
+      <div class="fg"><label>租户</label><input id="cm-tenant" value="default"></div>
+      <div class="fg"><label>地址</label><input id="cm-address" placeholder="XX大学图书馆一层"></div>
+      <div class="fg"><label>营业时间</label><input id="cm-hours" value="07:00-23:00"></div>
+      <div class="fg"><label>纬度 lat</label><input id="cm-lat" placeholder="39.9042"></div>
+      <div class="fg"><label>经度 lng</label><input id="cm-lng" placeholder="116.4074"></div>
+      <div class="mn">经纬度可先留空，设备照常上线，只是暂不参与「附近推荐」。</div>
+    </div>
+    <div class="mf">
+      <button class="btn" id="cm-cancel">取消</button>
+      <button class="btn primary" id="cm-ok">批准接入</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/admin.js?v=3"></script>
+<script>
+const { esc, fmtAge, ageOf, onlineInfo, PAPER_LABEL, PAPER_LEVEL } = PP;
+
+function renderDevices(devices){
+  document.getElementById("dev-count").textContent = devices.length + " 台";
+  const box = document.getElementById("devices");
+  if (!devices.length){
+    box.innerHTML = '<div class="empty">暂无设备接入 —— 现场工控机运行 client 后会自动注册</div>';
+    return;
+  }
+  box.innerHTML = devices.map(d => {
+    const { age, stale, online } = onlineInfo(d);
+    const cap = Number(d.paper_capacity || 0);
+    const left = d.paper_left === null || d.paper_left === undefined ? null : Number(d.paper_left);
+    const pct = cap > 0 && left !== null ? Math.max(0, Math.min(100, Math.round(left / cap * 100))) : null;
+    const lvl = PAPER_LEVEL[d.paper_state] || 0;
+    const low = lvl > 0 && lvl <= 2;
+    return `<div class="dev">
+      <div class="top">
+        <span class="id">${esc(d.device_id)}</span>
+        <span class="nm">${esc(d.name || "")}</span>
+        <span class="mdl">${esc(d.model || "")} ${d.driver ? "· " + esc(d.driver) : ""}</span>
+        <span class="pill ${online ? "on" : "off"}">${online ? "在线" : "离线"}</span>
+        ${low ? '<span class="pill crit">缺纸风险</span>' : ""}
+        <span class="age ${stale ? "stale" : ""}">${age === null ? "无心跳" : fmtAge(age)}</span>
+        <a class="btn sm" href="device.html?id=${encodeURIComponent(d.device_id)}" style="margin-left:10px">详情</a>
+        <button class="btn sm" data-cmd="test_page" data-dev="${esc(d.device_id)}">打印测试页</button>
+        <button class="btn sm" data-cmd="restart" data-dev="${esc(d.device_id)}">重启设备</button>
+        <button class="btn sm danger" data-del="${esc(d.device_id)}">删除</button>
+      </div>
+      <div class="row">
+        <div class="field"><div class="fk">纸张状态</div>
+          <div class="fv">${PAPER_LABEL[d.paper_state] || "未上报"}</div>
+          <div class="ticks">${[4,3,2,1].map(i =>
+            `<i class="${lvl >= i ? "on" + (low ? " low" : "") : ""}"></i>`).join("")}</div>
+        </div>
+        <div class="field"><div class="fk">估算剩余</div>
+          <div class="fv">${left === null ? "—" : left}<small>${cap ? " / " + cap + " 张" : ""}</small></div>
+        </div>
+        <div class="field"><div class="fk">累计用纸</div><div class="fv">${esc(d.pages_printed ?? 0)}<small> 张</small></div></div>
+        <div class="field"><div class="fk">队列深度</div><div class="fv">${esc(d.queue_depth ?? 0)}</div></div>
+      </div>
+      ${pct === null ? "" : `<div class="bar ${pct <= 10 ? "low" : ""}"><span style="width:${pct}%"></span></div>`}
+      <div class="paper-edit">
+        <span class="pe-t">设置纸量</span>
+        <label>纸盒容量 <input type="number" min="0" data-cap value="${cap > 0 ? cap : ""}" placeholder="250"> 张</label>
+        <label>当前剩余 <input type="number" min="0" data-left value="${left === null ? "" : left}" placeholder="留空 = 视为刚补满"> 张</label>
+        <button class="btn sm primary" data-save-paper="${esc(d.device_id)}">保存</button>
+        <span class="pe-msg" data-msg></span>
+        <span class="pe-note">设「当前剩余」即按实际值校准，之后每打印按张数递减；只改容量、剩余留空则视为刚补满。</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderMiniAlerts(alerts){
+  const open = alerts.filter(a => !a.resolved_at).length;
+  document.getElementById("al-count").textContent = alerts.length + " 条（未处理 " + open + "）";
+  const box = document.getElementById("alerts-mini");
+  if (!alerts.length){ box.innerHTML = '<div class="empty">当前无告警 —— 规则引擎每 10 秒扫描一次</div>'; return; }
+  box.innerHTML = alerts.slice(0, 6).map(a => {
+    const done = !!a.resolved_at;
+    return `<div class="al ${esc(a.level || "warning")} ${done ? "resolved" : ""}">
+      <div class="h">
+        <span class="rule-t">${esc(a.rule)}</span>
+        <span class="di">${esc(a.device_id)}</span>
+        <span class="pill ${a.level === "critical" ? "crit" : "warn"}">${a.level === "critical" ? "严重" : "预警"}</span>
+        <span class="t">${done ? "已处理" : fmtAge(ageOf(a.triggered_at))}</span>
+      </div>
+      <div class="m">${esc(a.message)}</div>
+    </div>`;
+  }).join("");
+}
+
+/* 待接入设备：客户端插电后出现在这里，批准即完成零配置接入 */
+let CLAIMS = [];
+let PENDING_CLAIM = null;
+
+function renderClaims(claims){
+  const card = document.getElementById("claim-card");
+  const box = document.getElementById("claims");
+  document.getElementById("claim-count").textContent = claims.length + " 台";
+  card.style.display = claims.length ? "" : "none";
+  if (!claims.length){ box.innerHTML = ""; return; }
+  box.innerHTML = claims.map(c => {
+    const printers = (c.printers || []).map(p => p.name).filter(Boolean);
+    const names = printers.length ? printers.join("、") : "未发现打印机队列";
+    return `<div class="dev"><div class="top">
+      <span class="id" style="font-size:20px;letter-spacing:4px">${esc(c.code || "")}</span>
+      <span class="nm">${esc(c.hostname || "未知主机")}</span>
+      <span class="mdl">${esc(names)}</span>
+      <button class="btn sm primary" data-claim-ok="${esc(c.claim_id)}">批准</button>
+      <button class="btn sm" data-claim-no="${esc(c.claim_id)}">忽略</button>
+    </div></div>`;
+  }).join("");
+}
+
+function openClaim(claimId){
+  PENDING_CLAIM = CLAIMS.find(c => c.claim_id === claimId) || null;
+  if (!PENDING_CLAIM) return;
+  const first = (PENDING_CLAIM.printers || []).find(
+    p => p.name === PENDING_CLAIM.selected_printer)
+    || (PENDING_CLAIM.printers || [])[0] || {};
+  document.getElementById("cm-hint").textContent =
+    `主机 ${PENDING_CLAIM.hostname || "未知"} · 队列 ${first.name || "未发现"} · 接入码 ${PENDING_CLAIM.code}`;
+  document.getElementById("cm-name").value =
+    (PENDING_CLAIM.hostname || "") + (first.name ? " · " + first.name : "");
+  document.getElementById("cm-tenant").value = "default";
+  document.getElementById("cm-address").value = "";
+  document.getElementById("cm-hours").value = "07:00-23:00";
+  document.getElementById("cm-lat").value = "";
+  document.getElementById("cm-lng").value = "";
+  document.getElementById("claim-mask").classList.add("on");
+}
+
+document.getElementById("claims").addEventListener("click", async (ev) => {
+  const ok = ev.target.closest("[data-claim-ok]");
+  const no = ev.target.closest("[data-claim-no]");
+  if (ok) return openClaim(ok.getAttribute("data-claim-ok"));
+  if (!no) return;
+  const claimId = no.getAttribute("data-claim-no");
+  no.disabled = true;
+  try{
+    await PP.post("/api/device/claims/" + encodeURIComponent(claimId) + "/reject", {});
+    load();
+  }catch(e){
+    alert(e.message);
+    no.disabled = false;
+  }
+});
+
+document.getElementById("cm-cancel").onclick = () => {
+  document.getElementById("claim-mask").classList.remove("on");
+};
+document.getElementById("claim-mask").addEventListener("click", (ev) => {
+  if (ev.target.id === "claim-mask") ev.target.classList.remove("on");
+});
+document.getElementById("cm-ok").onclick = async () => {
+  if (!PENDING_CLAIM) return;
+  const num = (id) => {
+    const raw = document.getElementById(id).value.trim();
+    return raw === "" ? null : Number(raw);
+  };
+  const body = {
+    tenant_id: document.getElementById("cm-tenant").value.trim() || "default",
+    name: document.getElementById("cm-name").value.trim(),
+    address: document.getElementById("cm-address").value.trim() || null,
+    business_hours: document.getElementById("cm-hours").value.trim() || null,
+    lat: num("cm-lat"),
+    lng: num("cm-lng"),
+    paper_capacity: PENDING_CLAIM.paper_capacity || 250,
+  };
+  if ((body.lat === null) !== (body.lng === null)){
+    alert("经纬度要么都填，要么都留空");
+    return;
+  }
+  const button = document.getElementById("cm-ok");
+  button.disabled = true;
+  try{
+    const result = await PP.postFull("/api/device/claims/"
+      + encodeURIComponent(PENDING_CLAIM.claim_id) + "/approve", body);
+    if (result && result.message && result.message !== "success"){
+      alert(result.message);
+      return;
+    }
+    document.getElementById("claim-mask").classList.remove("on");
+    PENDING_CLAIM = null;
+    load();
+  }catch(e){
+    alert(e.message);
+  }finally{
+    button.disabled = false;
+  }
+};
+
+/* 上次已渲染的设备数据指纹：数据没变就不重绘，避免清空用户正在填的纸量 */
+let lastDevSig = "";
+
+async function load(){
+  if (!PP.getKey()){
+    PP.setLive(false, "未配置密钥");
+    PP.showErr("未配置管理端密钥：页面不含内置密钥，请点右上角「密钥」输入与后端一致的 SECRET_KEY");
+    return;
+  }
+  try{
+    const [dev, al, cl] = await Promise.all([
+      PP.api("/api/device/list"),
+      PP.api("/api/alert/list"),
+      PP.api("/api/device/claims"),
+    ]);
+    PP.showErr(null);
+    PP.setLive(true, "实时");
+    const devices = dev.devices || [];
+    const alerts = al.alerts || [];
+    CLAIMS = cl.claims || [];
+    renderClaims(CLAIMS);
+    // 只在数据真的变了、且没停在纸量输入框上时才重绘设备列表：
+    // 每 5 秒无条件重绘会把用户没保存的输入清空，也会让浏览器的元素引用失效
+    const ae = document.activeElement;
+    const editing = ae && ae.tagName === "INPUT" && ae.closest && ae.closest(".paper-edit");
+    const sig = JSON.stringify(devices);
+    if (!editing && sig !== lastDevSig){
+      lastDevSig = sig;
+      renderDevices(devices);
+    }
+    renderMiniAlerts(alerts);
+    PP.setCounts({ devices: devices.length, alerts: alerts.filter(a => !a.resolved_at).length });
+  }catch(e){
+    PP.setLive(false, "断开");
+    PP.showErr(e.message);
+  }
+}
+
+/* 从打印机端发现本机队列 */
+let DISCOVERED = [];
+function slugDeviceId(name){
+  const base = (name || "").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return base ? "printer-" + base.slice(0, 24) : "";
+}
+async function loadDiscovered(){
+  const sel = document.getElementById("nf-discovered");
+  if (!sel) return;
+  try{
+    const d = await PP.api("/api/device/discovered");
+    DISCOVERED = d.printers || [];
+    if (!DISCOVERED.length){
+      sel.innerHTML = '<option value="">还没有客户端上报打印机：先启动 client 并设置 PRINTER_NAME</option>';
+      return;
+    }
+    sel.innerHTML = '<option value="">选择一台已发现的打印机，自动填入下面的信息</option>' +
+      DISCOVERED.map((p, i) => {
+        const extra = p.driver || p.port || "";
+        const state = p.device_online ? "在线" : "离线";
+        const used = p.in_use ? " · 当前在用" : "";
+        return `<option value="${i}">${esc(p.name)}${extra ? " · " + esc(extra) : ""} · ${state}${used}</option>`;
+      }).join("");
+  }catch(e){
+    sel.innerHTML = '<option value="">读取失败：' + esc(e.message) + '</option>';
+  }
+}
+document.getElementById("nf-discovered").onchange = (ev) => {
+  const p = DISCOVERED[Number(ev.target.value)];
+  if (!p) return;
+  document.getElementById("nf-name").value = p.name || "";
+  document.getElementById("nf-model").value = p.driver || p.name || "";
+  document.getElementById("nf-driver").value = p.driver || "";
+  document.getElementById("nf-conn").value = p.port || "";
+  const idEl = document.getElementById("nf-device_id");
+  if (!idEl.value.trim()) idEl.value = slugDeviceId(p.name);
+  const capEl = document.getElementById("nf-paper_capacity");
+  if (!capEl.value) capEl.value = 250;
+  document.getElementById("nf-msg").textContent =
+    "已填入，请确认设备ID与客户端 PRINTER_DEVICE_ID 一致";
+};
+document.getElementById("btn-discovered-refresh").onclick = () => loadDiscovered();
+
+/* 新增设备 */
+const NEW_FIELDS = ["nf-device_id","nf-name","nf-model","nf-driver","nf-conn","nf-paper_capacity"];
+document.getElementById("btn-new").onclick = () => {
+  document.getElementById("new-form").classList.toggle("on");
+  document.getElementById("nf-msg").textContent = "";
+  if (document.getElementById("new-form").classList.contains("on")) loadDiscovered();
+};
+document.getElementById("btn-new-cancel").onclick = () => {
+  document.getElementById("new-form").classList.remove("on");
+  document.getElementById("nf-msg").textContent = "";
+};
+document.getElementById("btn-new-submit").onclick = async () => {
+  const msg = document.getElementById("nf-msg");
+  const device_id = document.getElementById("nf-device_id").value.trim();
+  if (!device_id){ msg.textContent = "设备ID 为必填项"; return; }
+  const body = {
+    device_id,
+    name: document.getElementById("nf-name").value.trim(),
+    model: document.getElementById("nf-model").value.trim(),
+    driver: document.getElementById("nf-driver").value.trim(),
+    conn: document.getElementById("nf-conn").value.trim(),
+    paper_capacity: Number(document.getElementById("nf-paper_capacity").value || 0),
+    paper_state: document.getElementById("nf-paper_state").value || null,
+  };
+  msg.textContent = "写入中…";
+  try{
+    await PP.post("/api/device/register", body);
+    msg.textContent = "已写入数据库：" + device_id;
+    NEW_FIELDS.forEach(id => document.getElementById(id).value = "");
+    document.getElementById("nf-paper_state").value = "";
+    document.getElementById("nf-discovered").value = "";
+    PP.showErr(null);
+    load();
+  }catch(e){ msg.textContent = "写入失败：" + e.message; }
+};
+
+/* 删除设备 / 设置纸量（事件委托） */
+document.getElementById("devices").addEventListener("click", async (ev) => {
+  const t = ev.target;
+  if (!t.getAttribute) return;
+
+  /* 设置纸量：纸盒容量 / 当前剩余张数 */
+  const saveId = t.getAttribute("data-save-paper");
+  if (saveId){
+    const card = t.closest(".dev");
+    const capEl = card.querySelector("[data-cap]");
+    const leftEl = card.querySelector("[data-left]");
+    const msg = card.querySelector("[data-msg]");
+    const pageMsg = document.getElementById("paper-msg");
+    const body = {};
+    if (capEl.value.trim() !== "") body.paper_capacity = Number(capEl.value);
+    if (leftEl.value.trim() !== "") body.paper_left = Number(leftEl.value);
+    if (body.paper_capacity === undefined && body.paper_left === undefined){
+      pageMsg.className = "pe-msg bad";
+      pageMsg.textContent = "保存失败：容量与剩余至少填一项";
+      return;
+    }
+    t.disabled = true;
+    pageMsg.className = "pe-msg";
+    pageMsg.textContent = "保存中…";
+    try{
+      const r = await PP.postFull("/api/device/" + encodeURIComponent(saveId) + "/paper", body);
+      if (r.message !== "success") throw new Error(r.message || "保存失败");
+      PP.showErr(null);
+      const d = (r.data && r.data.device) || {};
+      pageMsg.className = "pe-msg ok";
+      pageMsg.textContent = "已保存 " + saveId + "：剩余 "
+        + (d.paper_left === null || d.paper_left === undefined ? "—" : d.paper_left)
+        + " / " + (d.paper_capacity || 0) + " 张";
+      msg.textContent = "";
+      setTimeout(() => { pageMsg.textContent = ""; }, 6000);
+      // 先让输入框失焦，否则「不打断输入」的保护规则会挡住本次刷新，
+      // 卡片上的「估算剩余」不会跟着更新
+      const ae = document.activeElement;
+      if (ae && ae.blur) ae.blur();
+      load();
+    }catch(e){
+      pageMsg.className = "pe-msg bad";
+      pageMsg.textContent = "保存失败：" + e.message;
+      t.disabled = false;
+    }
+    return;
+  }
+
+  /* 下发设备指令：打印测试页 / 重启打印机端 */
+  const cmd = t.getAttribute("data-cmd");
+  if (cmd){
+    const deviceId = t.getAttribute("data-dev");
+    const pageMsg = document.getElementById("paper-msg");
+    if (cmd === "restart" && !window.confirm("确定重启 " + deviceId + " 的打印机端客户端？")) return;
+    t.disabled = true;
+    pageMsg.className = "pe-msg";
+    pageMsg.textContent = "指令下发中…";
+    try{
+      const r = await PP.postFull(
+        "/api/device/" + encodeURIComponent(deviceId) + "/command", { command: cmd });
+      if (r.message !== "success") throw new Error(r.message || "下发失败");
+      pageMsg.className = "pe-msg ok";
+      pageMsg.textContent = (r.data && r.data.note) || "指令已下发";
+      setTimeout(() => { pageMsg.textContent = ""; }, 8000);
+      load();
+    }catch(e){
+      pageMsg.className = "pe-msg bad";
+      pageMsg.textContent = "下发失败：" + e.message;
+      t.disabled = false;
+    }
+    return;
+  }
+
+  /* 删除设备 */
+  const id = t.getAttribute("data-del");
+  if (!id) return;
+  if (!confirm("确认从数据库删除设备 " + id + "？\n该设备名下的告警记录会一并清理。")) return;
+  t.disabled = true;
+  try{
+    await PP.del("/api/device/" + encodeURIComponent(id));
+    PP.showErr(null);
+  }catch(e){ PP.showErr("删除失败：" + e.message); }
+  load();
+});
+
+PP.boot(load);
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+/* 思印客 Silnk · 用户端全局样式（白底清爽 + 蓝色点缀） */
+:root{
+  /* 蓝色点缀：仅用于主操作、选中态、强调数字 */
+  --blue:#4C63F0; --blue-600:#3F53D9; --blue-700:#2F3FCB;
+  --blue-50:#EEF2FF; --blue-100:#DCE4FF;
+  /* 白底体系 */
+  --bg:#F7F9FE; --white:#FFFFFF; --surface:#FFFFFF;
+  --line:#E9EDF7; --line-2:#F7F9FE; --line-strong:#D5DEF2;
+  --ink:#141B34; --ink-2:#5D6784; --ink-3:#8B94AC;
+  --ok:#16A34A; --ok-bg:#E9F7EF;
+  --warn:#D97706; --warn-bg:#FDF3E4;
+  --danger:#DC2626; --danger-bg:#FDECEC;
+  --r:12px; --r-sm:8px;
+  --sh:0 1px 2px rgba(15,23,42,.04), 0 6px 16px rgba(15,23,42,.06);
+  --font:'HarmonyOS Sans SC','PingFang SC','Microsoft YaHei',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --num:'Manrope',ui-monospace,Menlo,Consolas,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body,#app{margin:0;padding:0;min-height:100%}
+body{
+  font-family:var(--font);font-size:15.5px;line-height:1.55;color:var(--ink);
+  background:var(--bg);-webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit}

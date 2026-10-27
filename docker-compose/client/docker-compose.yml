@@ -1,0 +1,22 @@
+services:
+  printer:
+    # 用本地 client 目录构建，确保包含最新的型号/能力识别代码；
+    # 不再依赖旧的预构建镜像（233kun/printer-client）
+    build:
+      context: ../../client
+      dockerfile: Dockerfile
+    image: silnk-printer-client:local
+    container_name: printer
+    restart: unless-stopped
+    environment:
+      - SERVER_HOST=       # 后端 API 完整地址，如 https://silnk.cn
+      - PRINTER_URL=       # ipp://localhost:631/printers/<CUPS 队列名>
+      - SECRET_KEY=        # 与后端一致的密钥
+      - PRINTER_DEVICE_ID= # 多台打印机必须不同，避免心跳互相覆盖
+    ports:
+      - "631:631"
+    volumes:
+      - cups-config:/etc/cups
+
+volumes:
+  cups-config:
