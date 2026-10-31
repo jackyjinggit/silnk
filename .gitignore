@@ -21,7 +21,6 @@ static/library/files/
 # 敏感/本地配置（仓库只保留示例）
 .env
 .env.*
-*.bak
 client/start_win.bat
 # 零配置接入生成的设备令牌，绝不入库
 client/config.json
@@ -53,6 +52,7 @@ static/app/dist/static/tutorial/*.gif
 Thumbs.db
 
 # 原项目遗留的子模块配置（pdfjs 目录已不存在）
+
 .gitmodules
 
 # 运行数据库（含订单/取件码，脱敏扫描标记，禁止入仓）
@@ -60,3 +60,8 @@ printer.db
 *.db
 *.sqlite
 *.sqlite3
+
+# 操作过程备份文件（改前 .bak / README 恢复件等）——禁止入仓
+*.bak
+*.bak_*
+README.md.bak*
